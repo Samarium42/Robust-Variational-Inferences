@@ -1,0 +1,3 @@
+Config => dataset=spirals  prior=gaussian_wide  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Saved: out_fm_solver/fm_spirals_gaussian_wide_h256_lr0.001.pt
+Saved: out_fm_solver/samples_spirals_gaussian_wide_h256_lr0.001.npy

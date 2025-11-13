@@ -1,0 +1,35 @@
+Config => dataset=spirals  prior=ringmix  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 9.918047
+Step    200 / 6000    Loss: 7.392878
+Step    400 / 6000    Loss: 7.310227
+Step    600 / 6000    Loss: 7.626479
+Step    800 / 6000    Loss: 7.376036
+Step   1000 / 6000    Loss: 7.099004
+Step   1200 / 6000    Loss: 7.370419
+Step   1400 / 6000    Loss: 6.676361
+Step   1600 / 6000    Loss: 6.668176
+Step   1800 / 6000    Loss: 7.244964
+Step   2000 / 6000    Loss: 7.581869
+Step   2200 / 6000    Loss: 7.120930
+Step   2400 / 6000    Loss: 6.836828
+Step   2600 / 6000    Loss: 6.721982
+Step   2800 / 6000    Loss: 6.629779
+Step   3000 / 6000    Loss: 7.155056
+Step   3200 / 6000    Loss: 6.782845
+Step   3400 / 6000    Loss: 6.751091
+Step   3600 / 6000    Loss: 6.844888
+Step   3800 / 6000    Loss: 6.675351
+Step   4000 / 6000    Loss: 6.984713
+Step   4200 / 6000    Loss: 6.555170
+Step   4400 / 6000    Loss: 6.759270
+Step   4600 / 6000    Loss: 6.888474
+Step   4800 / 6000    Loss: 6.473386
+Step   5000 / 6000    Loss: 7.375610
+Step   5200 / 6000    Loss: 6.889324
+Step   5400 / 6000    Loss: 7.030733
+Step   5600 / 6000    Loss: 7.132595
+Step   5800 / 6000    Loss: 6.914273
+Step   6000 / 6000    Loss: 7.241831
+Saved: out_fm_solver/fm_spirals_ringmix_h256_lr0.001.pt
+Saved: out_fm_solver/samples_spirals_ringmix_h256_lr0.001.npy

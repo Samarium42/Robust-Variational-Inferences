@@ -1,0 +1,35 @@
+Config => dataset=spirals  prior=student_t  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 5.572528
+Step    200 / 6000    Loss: 4.374545
+Step    400 / 6000    Loss: 4.158577
+Step    600 / 6000    Loss: 4.004097
+Step    800 / 6000    Loss: 3.900533
+Step   1000 / 6000    Loss: 3.997010
+Step   1200 / 6000    Loss: 4.233825
+Step   1400 / 6000    Loss: 4.072793
+Step   1600 / 6000    Loss: 4.263730
+Step   1800 / 6000    Loss: 3.937377
+Step   2000 / 6000    Loss: 4.044428
+Step   2200 / 6000    Loss: 4.128100
+Step   2400 / 6000    Loss: 4.204686
+Step   2600 / 6000    Loss: 3.724683
+Step   2800 / 6000    Loss: 3.860564
+Step   3000 / 6000    Loss: 4.225170
+Step   3200 / 6000    Loss: 4.095951
+Step   3400 / 6000    Loss: 4.269917
+Step   3600 / 6000    Loss: 4.127169
+Step   3800 / 6000    Loss: 4.020369
+Step   4000 / 6000    Loss: 3.973421
+Step   4200 / 6000    Loss: 3.861141
+Step   4400 / 6000    Loss: 4.048619
+Step   4600 / 6000    Loss: 3.824215
+Step   4800 / 6000    Loss: 3.589048
+Step   5000 / 6000    Loss: 4.270961
+Step   5200 / 6000    Loss: 4.237077
+Step   5400 / 6000    Loss: 4.178972
+Step   5600 / 6000    Loss: 3.968526
+Step   5800 / 6000    Loss: 4.220724
+Step   6000 / 6000    Loss: 4.255322
+Saved: out_fm_solver/fm_spirals_student_t_h256_lr0.001.pt
+Saved: out_fm_solver/samples_spirals_student_t_h256_lr0.001.npy

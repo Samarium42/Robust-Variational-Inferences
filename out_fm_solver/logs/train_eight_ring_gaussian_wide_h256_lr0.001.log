@@ -1,0 +1,35 @@
+Config => dataset=eight_ring  prior=gaussian_wide  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 13.271654
+Step    200 / 6000    Loss: 6.859508
+Step    400 / 6000    Loss: 6.665569
+Step    600 / 6000    Loss: 6.274489
+Step    800 / 6000    Loss: 5.774958
+Step   1000 / 6000    Loss: 6.469947
+Step   1200 / 6000    Loss: 6.052662
+Step   1400 / 6000    Loss: 6.225039
+Step   1600 / 6000    Loss: 6.150797
+Step   1800 / 6000    Loss: 6.011485
+Step   2000 / 6000    Loss: 6.220767
+Step   2200 / 6000    Loss: 6.462419
+Step   2400 / 6000    Loss: 6.196241
+Step   2600 / 6000    Loss: 5.774637
+Step   2800 / 6000    Loss: 6.046844
+Step   3000 / 6000    Loss: 6.417812
+Step   3200 / 6000    Loss: 6.230794
+Step   3400 / 6000    Loss: 6.322990
+Step   3600 / 6000    Loss: 6.057914
+Step   3800 / 6000    Loss: 6.243821
+Step   4000 / 6000    Loss: 6.642969
+Step   4200 / 6000    Loss: 5.686810
+Step   4400 / 6000    Loss: 6.214005
+Step   4600 / 6000    Loss: 6.268073
+Step   4800 / 6000    Loss: 6.347983
+Step   5000 / 6000    Loss: 5.814505
+Step   5200 / 6000    Loss: 5.981161
+Step   5400 / 6000    Loss: 5.941091
+Step   5600 / 6000    Loss: 5.938724
+Step   5800 / 6000    Loss: 6.377860
+Step   6000 / 6000    Loss: 5.984885
+Saved: out_fm_solver/fm_eight_ring_gaussian_wide_h256_lr0.001.pt
+Saved: out_fm_solver/samples_eight_ring_gaussian_wide_h256_lr0.001.npy

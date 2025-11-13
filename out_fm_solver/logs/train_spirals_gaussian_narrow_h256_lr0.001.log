@@ -1,0 +1,35 @@
+Config => dataset=spirals  prior=gaussian_narrow  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 4.102923
+Step    200 / 6000    Loss: 1.308506
+Step    400 / 6000    Loss: 1.326930
+Step    600 / 6000    Loss: 1.225457
+Step    800 / 6000    Loss: 1.311287
+Step   1000 / 6000    Loss: 1.335673
+Step   1200 / 6000    Loss: 1.201494
+Step   1400 / 6000    Loss: 1.286199
+Step   1600 / 6000    Loss: 1.213196
+Step   1800 / 6000    Loss: 1.238044
+Step   2000 / 6000    Loss: 1.298840
+Step   2200 / 6000    Loss: 1.144559
+Step   2400 / 6000    Loss: 1.294260
+Step   2600 / 6000    Loss: 1.250212
+Step   2800 / 6000    Loss: 1.239232
+Step   3000 / 6000    Loss: 1.317286
+Step   3200 / 6000    Loss: 1.164476
+Step   3400 / 6000    Loss: 1.206226
+Step   3600 / 6000    Loss: 1.249789
+Step   3800 / 6000    Loss: 1.198581
+Step   4000 / 6000    Loss: 1.315127
+Step   4200 / 6000    Loss: 1.138411
+Step   4400 / 6000    Loss: 1.199709
+Step   4600 / 6000    Loss: 1.183939
+Step   4800 / 6000    Loss: 1.256764
+Step   5000 / 6000    Loss: 1.242271
+Step   5200 / 6000    Loss: 1.134961
+Step   5400 / 6000    Loss: 1.232919
+Step   5600 / 6000    Loss: 1.207095
+Step   5800 / 6000    Loss: 1.227841
+Step   6000 / 6000    Loss: 1.219848
+Saved: out_fm_solver/fm_spirals_gaussian_narrow_h256_lr0.001.pt
+Saved: out_fm_solver/samples_spirals_gaussian_narrow_h256_lr0.001.npy

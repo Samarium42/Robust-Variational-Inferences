@@ -1,0 +1,35 @@
+Config => dataset=moons  prior=ringmix  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 6.441354
+Step    200 / 6000    Loss: 1.861872
+Step    400 / 6000    Loss: 1.855293
+Step    600 / 6000    Loss: 1.868896
+Step    800 / 6000    Loss: 1.814583
+Step   1000 / 6000    Loss: 1.818926
+Step   1200 / 6000    Loss: 1.766821
+Step   1400 / 6000    Loss: 1.875217
+Step   1600 / 6000    Loss: 1.959334
+Step   1800 / 6000    Loss: 1.820847
+Step   2000 / 6000    Loss: 1.845363
+Step   2200 / 6000    Loss: 2.031402
+Step   2400 / 6000    Loss: 1.796740
+Step   2600 / 6000    Loss: 1.891780
+Step   2800 / 6000    Loss: 1.864949
+Step   3000 / 6000    Loss: 1.830415
+Step   3200 / 6000    Loss: 1.807283
+Step   3400 / 6000    Loss: 1.748449
+Step   3600 / 6000    Loss: 1.933933
+Step   3800 / 6000    Loss: 1.838787
+Step   4000 / 6000    Loss: 1.841800
+Step   4200 / 6000    Loss: 1.955490
+Step   4400 / 6000    Loss: 1.943949
+Step   4600 / 6000    Loss: 1.835795
+Step   4800 / 6000    Loss: 1.919627
+Step   5000 / 6000    Loss: 1.894843
+Step   5200 / 6000    Loss: 1.832476
+Step   5400 / 6000    Loss: 1.773641
+Step   5600 / 6000    Loss: 1.765603
+Step   5800 / 6000    Loss: 1.801304
+Step   6000 / 6000    Loss: 1.905117
+Saved: out_fm_solver/fm_moons_ringmix_h256_lr0.001.pt
+Saved: out_fm_solver/samples_moons_ringmix_h256_lr0.001.npy

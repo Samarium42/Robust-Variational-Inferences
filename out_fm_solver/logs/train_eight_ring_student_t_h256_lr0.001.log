@@ -1,0 +1,35 @@
+Config => dataset=eight_ring  prior=student_t  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 12.298672
+Step    200 / 6000    Loss: 5.431663
+Step    400 / 6000    Loss: 5.529136
+Step    600 / 6000    Loss: 4.463407
+Step    800 / 6000    Loss: 4.765032
+Step   1000 / 6000    Loss: 4.231110
+Step   1200 / 6000    Loss: 4.639596
+Step   1400 / 6000    Loss: 5.129292
+Step   1600 / 6000    Loss: 5.034376
+Step   1800 / 6000    Loss: 4.710721
+Step   2000 / 6000    Loss: 4.151372
+Step   2200 / 6000    Loss: 4.170306
+Step   2400 / 6000    Loss: 4.688596
+Step   2600 / 6000    Loss: 4.431172
+Step   2800 / 6000    Loss: 5.060424
+Step   3000 / 6000    Loss: 4.643597
+Step   3200 / 6000    Loss: 4.727986
+Step   3400 / 6000    Loss: 5.156681
+Step   3600 / 6000    Loss: 4.414118
+Step   3800 / 6000    Loss: 4.369602
+Step   4000 / 6000    Loss: 4.950920
+Step   4200 / 6000    Loss: 4.432723
+Step   4400 / 6000    Loss: 5.078379
+Step   4600 / 6000    Loss: 4.377403
+Step   4800 / 6000    Loss: 4.479568
+Step   5000 / 6000    Loss: 4.566353
+Step   5200 / 6000    Loss: 5.087503
+Step   5400 / 6000    Loss: 4.521210
+Step   5600 / 6000    Loss: 4.446987
+Step   5800 / 6000    Loss: 4.848387
+Step   6000 / 6000    Loss: 5.094670
+Saved: out_fm_solver/fm_eight_ring_student_t_h256_lr0.001.pt
+Saved: out_fm_solver/samples_eight_ring_student_t_h256_lr0.001.npy

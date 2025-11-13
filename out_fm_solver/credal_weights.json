@@ -1,0 +1,50 @@
+{
+  "eight_ring": {
+    "priors": [
+      "gaussian",
+      "gaussian_narrow",
+      "gaussian_wide",
+      "ringmix",
+      "student_t"
+    ],
+    "weights": [
+      0.9763145446777344,
+      0.00419336324557662,
+      0.013748440891504288,
+      0.003016826929524541,
+      0.0027268538251519203
+    ]
+  },
+  "spirals": {
+    "priors": [
+      "gaussian",
+      "gaussian_narrow",
+      "gaussian_wide",
+      "ringmix",
+      "student_t"
+    ],
+    "weights": [
+      0.9805692434310913,
+      0.0027506863698363304,
+      0.012706606648862362,
+      0.0015890492359176278,
+      0.002384376246482134
+    ]
+  },
+  "moons": {
+    "priors": [
+      "gaussian",
+      "gaussian_narrow",
+      "gaussian_wide",
+      "ringmix",
+      "student_t"
+    ],
+    "weights": [
+      0.009808375500142574,
+      0.0032607445027679205,
+      0.003418626030907035,
+      0.978185772895813,
+      0.005326480139046907
+    ]
+  }
+}

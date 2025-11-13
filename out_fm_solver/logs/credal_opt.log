@@ -1,0 +1,56 @@
+
+=== Optimising credal weights for dataset: eight_ring ===
+[eight_ring] step     1/3000  KL_lb≈-0.0014  w=gaussian:0.20 gaussian_narrow:0.20 gaussian_wide:0.20 ringmix:0.20 student_t:0.20
+[eight_ring] step   200/3000  KL_lb≈0.0167  w=gaussian:0.23 gaussian_narrow:0.22 gaussian_wide:0.24 ringmix:0.14 student_t:0.17
+[eight_ring] step   400/3000  KL_lb≈0.0192  w=gaussian:0.28 gaussian_narrow:0.23 gaussian_wide:0.28 ringmix:0.09 student_t:0.13
+[eight_ring] step   600/3000  KL_lb≈0.0279  w=gaussian:0.35 gaussian_narrow:0.18 gaussian_wide:0.32 ringmix:0.07 student_t:0.08
+[eight_ring] step   800/3000  KL_lb≈0.0567  w=gaussian:0.44 gaussian_narrow:0.12 gaussian_wide:0.34 ringmix:0.05 student_t:0.06
+[eight_ring] step  1000/3000  KL_lb≈0.0625  w=gaussian:0.54 gaussian_narrow:0.08 gaussian_wide:0.31 ringmix:0.03 student_t:0.04
+[eight_ring] step  1200/3000  KL_lb≈0.0704  w=gaussian:0.66 gaussian_narrow:0.05 gaussian_wide:0.24 ringmix:0.03 student_t:0.03
+[eight_ring] step  1400/3000  KL_lb≈0.0757  w=gaussian:0.77 gaussian_narrow:0.04 gaussian_wide:0.16 ringmix:0.02 student_t:0.02
+[eight_ring] step  1600/3000  KL_lb≈0.0895  w=gaussian:0.84 gaussian_narrow:0.03 gaussian_wide:0.10 ringmix:0.01 student_t:0.01
+[eight_ring] step  1800/3000  KL_lb≈0.1111  w=gaussian:0.89 gaussian_narrow:0.02 gaussian_wide:0.07 ringmix:0.01 student_t:0.01
+[eight_ring] step  2000/3000  KL_lb≈0.1032  w=gaussian:0.92 gaussian_narrow:0.01 gaussian_wide:0.05 ringmix:0.01 student_t:0.01
+[eight_ring] step  2200/3000  KL_lb≈0.1326  w=gaussian:0.94 gaussian_narrow:0.01 gaussian_wide:0.03 ringmix:0.01 student_t:0.01
+[eight_ring] step  2400/3000  KL_lb≈0.1366  w=gaussian:0.96 gaussian_narrow:0.01 gaussian_wide:0.03 ringmix:0.01 student_t:0.00
+[eight_ring] step  2600/3000  KL_lb≈0.1345  w=gaussian:0.96 gaussian_narrow:0.01 gaussian_wide:0.02 ringmix:0.00 student_t:0.00
+[eight_ring] step  2800/3000  KL_lb≈0.1343  w=gaussian:0.97 gaussian_narrow:0.01 gaussian_wide:0.02 ringmix:0.00 student_t:0.00
+[eight_ring] step  3000/3000  KL_lb≈0.1264  w=gaussian:0.98 gaussian_narrow:0.00 gaussian_wide:0.01 ringmix:0.00 student_t:0.00
+
+=== Optimising credal weights for dataset: spirals ===
+[spirals] step     1/3000  KL_lb≈-0.0002  w=gaussian:0.20 gaussian_narrow:0.20 gaussian_wide:0.20 ringmix:0.20 student_t:0.20
+[spirals] step   200/3000  KL_lb≈0.0003  w=gaussian:0.22 gaussian_narrow:0.23 gaussian_wide:0.17 ringmix:0.20 student_t:0.17
+[spirals] step   400/3000  KL_lb≈0.0034  w=gaussian:0.27 gaussian_narrow:0.26 gaussian_wide:0.18 ringmix:0.15 student_t:0.13
+[spirals] step   600/3000  KL_lb≈0.0270  w=gaussian:0.39 gaussian_narrow:0.14 gaussian_wide:0.25 ringmix:0.08 student_t:0.15
+[spirals] step   800/3000  KL_lb≈0.0359  w=gaussian:0.48 gaussian_narrow:0.08 gaussian_wide:0.29 ringmix:0.05 student_t:0.10
+[spirals] step  1000/3000  KL_lb≈0.0477  w=gaussian:0.56 gaussian_narrow:0.05 gaussian_wide:0.30 ringmix:0.03 student_t:0.05
+[spirals] step  1200/3000  KL_lb≈0.0572  w=gaussian:0.63 gaussian_narrow:0.03 gaussian_wide:0.28 ringmix:0.02 student_t:0.03
+[spirals] step  1400/3000  KL_lb≈0.0776  w=gaussian:0.72 gaussian_narrow:0.02 gaussian_wide:0.23 ringmix:0.01 student_t:0.02
+[spirals] step  1600/3000  KL_lb≈0.0776  w=gaussian:0.80 gaussian_narrow:0.02 gaussian_wide:0.16 ringmix:0.01 student_t:0.02
+[spirals] step  1800/3000  KL_lb≈0.0990  w=gaussian:0.87 gaussian_narrow:0.01 gaussian_wide:0.10 ringmix:0.01 student_t:0.01
+[spirals] step  2000/3000  KL_lb≈0.1045  w=gaussian:0.91 gaussian_narrow:0.01 gaussian_wide:0.06 ringmix:0.01 student_t:0.01
+[spirals] step  2200/3000  KL_lb≈0.1133  w=gaussian:0.94 gaussian_narrow:0.01 gaussian_wide:0.04 ringmix:0.00 student_t:0.01
+[spirals] step  2400/3000  KL_lb≈0.1272  w=gaussian:0.96 gaussian_narrow:0.01 gaussian_wide:0.03 ringmix:0.00 student_t:0.00
+[spirals] step  2600/3000  KL_lb≈0.1380  w=gaussian:0.97 gaussian_narrow:0.00 gaussian_wide:0.02 ringmix:0.00 student_t:0.00
+[spirals] step  2800/3000  KL_lb≈0.1237  w=gaussian:0.98 gaussian_narrow:0.00 gaussian_wide:0.02 ringmix:0.00 student_t:0.00
+[spirals] step  3000/3000  KL_lb≈0.1438  w=gaussian:0.98 gaussian_narrow:0.00 gaussian_wide:0.01 ringmix:0.00 student_t:0.00
+
+=== Optimising credal weights for dataset: moons ===
+[moons] step     1/3000  KL_lb≈-0.0000  w=gaussian:0.20 gaussian_narrow:0.20 gaussian_wide:0.20 ringmix:0.20 student_t:0.20
+[moons] step   200/3000  KL_lb≈0.0215  w=gaussian:0.23 gaussian_narrow:0.17 gaussian_wide:0.16 ringmix:0.24 student_t:0.19
+[moons] step   400/3000  KL_lb≈0.0395  w=gaussian:0.30 gaussian_narrow:0.14 gaussian_wide:0.11 ringmix:0.24 student_t:0.20
+[moons] step   600/3000  KL_lb≈0.0560  w=gaussian:0.33 gaussian_narrow:0.11 gaussian_wide:0.08 ringmix:0.30 student_t:0.17
+[moons] step   800/3000  KL_lb≈0.0930  w=gaussian:0.27 gaussian_narrow:0.08 gaussian_wide:0.06 ringmix:0.47 student_t:0.13
+[moons] step  1000/3000  KL_lb≈0.1166  w=gaussian:0.16 gaussian_narrow:0.05 gaussian_wide:0.04 ringmix:0.66 student_t:0.08
+[moons] step  1200/3000  KL_lb≈0.1416  w=gaussian:0.10 gaussian_narrow:0.03 gaussian_wide:0.03 ringmix:0.78 student_t:0.05
+[moons] step  1400/3000  KL_lb≈0.1540  w=gaussian:0.07 gaussian_narrow:0.02 gaussian_wide:0.02 ringmix:0.85 student_t:0.04
+[moons] step  1600/3000  KL_lb≈0.1666  w=gaussian:0.05 gaussian_narrow:0.02 gaussian_wide:0.01 ringmix:0.90 student_t:0.03
+[moons] step  1800/3000  KL_lb≈0.1806  w=gaussian:0.04 gaussian_narrow:0.01 gaussian_wide:0.01 ringmix:0.92 student_t:0.02
+[moons] step  2000/3000  KL_lb≈0.1926  w=gaussian:0.03 gaussian_narrow:0.01 gaussian_wide:0.01 ringmix:0.94 student_t:0.01
+[moons] step  2200/3000  KL_lb≈0.2033  w=gaussian:0.02 gaussian_narrow:0.01 gaussian_wide:0.01 ringmix:0.95 student_t:0.01
+[moons] step  2400/3000  KL_lb≈0.2259  w=gaussian:0.02 gaussian_narrow:0.01 gaussian_wide:0.01 ringmix:0.96 student_t:0.01
+[moons] step  2600/3000  KL_lb≈0.2111  w=gaussian:0.01 gaussian_narrow:0.00 gaussian_wide:0.00 ringmix:0.97 student_t:0.01
+[moons] step  2800/3000  KL_lb≈0.2273  w=gaussian:0.01 gaussian_narrow:0.00 gaussian_wide:0.00 ringmix:0.97 student_t:0.01
+[moons] step  3000/3000  KL_lb≈0.2375  w=gaussian:0.01 gaussian_narrow:0.00 gaussian_wide:0.00 ringmix:0.98 student_t:0.01
+
+Saved weights to out_fm_solver/credal_weights.json

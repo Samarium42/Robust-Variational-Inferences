@@ -1,0 +1,35 @@
+Config => dataset=moons  prior=student_t  hidden=256  lr=0.001  seed=1337  steps=6000  batch=1024
+Training FM solver…
+Step      1 / 6000    Loss: 2.283210
+Step    200 / 6000    Loss: 1.381154
+Step    400 / 6000    Loss: 1.245960
+Step    600 / 6000    Loss: 1.237830
+Step    800 / 6000    Loss: 1.246059
+Step   1000 / 6000    Loss: 1.301311
+Step   1200 / 6000    Loss: 1.195572
+Step   1400 / 6000    Loss: 1.291287
+Step   1600 / 6000    Loss: 1.296328
+Step   1800 / 6000    Loss: 1.268249
+Step   2000 / 6000    Loss: 1.261950
+Step   2200 / 6000    Loss: 1.216891
+Step   2400 / 6000    Loss: 1.272865
+Step   2600 / 6000    Loss: 1.183814
+Step   2800 / 6000    Loss: 1.214688
+Step   3000 / 6000    Loss: 1.271971
+Step   3200 / 6000    Loss: 1.371857
+Step   3400 / 6000    Loss: 1.245587
+Step   3600 / 6000    Loss: 1.272649
+Step   3800 / 6000    Loss: 1.230170
+Step   4000 / 6000    Loss: 1.202473
+Step   4200 / 6000    Loss: 1.264409
+Step   4400 / 6000    Loss: 1.366321
+Step   4600 / 6000    Loss: 1.243494
+Step   4800 / 6000    Loss: 1.232372
+Step   5000 / 6000    Loss: 1.214518
+Step   5200 / 6000    Loss: 1.285475
+Step   5400 / 6000    Loss: 1.284806
+Step   5600 / 6000    Loss: 1.277196
+Step   5800 / 6000    Loss: 1.392443
+Step   6000 / 6000    Loss: 1.279097
+Saved: out_fm_solver/fm_moons_student_t_h256_lr0.001.pt
+Saved: out_fm_solver/samples_moons_student_t_h256_lr0.001.npy
