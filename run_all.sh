@@ -1,91 +1,56 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ---- grids ----
 DATASETS=("eight_ring" "spirals" "moons")
 PRIORS=("gaussian" "gaussian_narrow" "gaussian_wide" "student_t" "ringmix")
+SEEDS=(0 1 2 3 4 5 6 7 8 9)
 
-# ---- common hparams (tweak here) ----
 STEPS=6000
-BATCH=1024
+BATCH=2048
 HIDDEN=256
-LR=0.001                # we found 1e-3 stable with the new net
-SEED=1337
+DEPTH=6
+LR=0.0005
+WEIGHT_DECAY=0.01
+
 NSAMPLES=20000
-STEP_SIZE=0.02          # ODE step size; feel free to tune per dataset
+STEP_SIZE=0.02
+
 OUTDIR="out_fm_solver"
+mkdir -p "${OUTDIR}/models" "${OUTDIR}/samples"
 
-mkdir -p "${OUTDIR}"
-LOGDIR="${OUTDIR}/logs"
-mkdir -p "${LOGDIR}"
+for SEED in "${SEEDS[@]}"; do
+  for d in "${DATASETS[@]}"; do
+    echo "=============================="
+    echo "Training conditional model: dataset=${d}, seed=${SEED}"
+    echo "=============================="
 
-run_one() {
-  local d="$1"
-  local p="$2"
+    python3 train_flow.py \
+      --dataset "${d}" \
+      --priors "$(IFS=,; echo "${PRIORS[*]}")" \
+      --steps "${STEPS}" \
+      --batch "${BATCH}" \
+      --hidden "${HIDDEN}" \
+      --depth "${DEPTH}" \
+      --lr "${LR}" \
+      --weight_decay "${WEIGHT_DECAY}" \
+      --seed "${SEED}" \
+      --outdir "${OUTDIR}" \
+      --print_every 200
 
-  echo "=== Training: dataset=${d} prior=${p} ==="
-  # Train
-  python3 train_flow.py \
-    --dataset "${d}" \
-    --prior   "${p}" \
-    --steps   "${STEPS}" \
-    --batch   "${BATCH}" \
-    --hidden  "${HIDDEN}" \
-    --lr      "${LR}" \
-    --seed    "${SEED}" \
-    --outdir  "${OUTDIR}" \
-    --print_every 200 \
-    2>&1 | tee "${LOGDIR}/train_${d}_${p}_h${HIDDEN}_lr${LR}.log"
+    MODEL_PATH="${OUTDIR}/models/fm_${d}_seed${SEED}.pt"
+    mv "${OUTDIR}/fm_${d}_cond_h${HIDDEN}_d${DEPTH}_lr${LR}.pt" "${MODEL_PATH}"
 
-  echo "=== Sampling: dataset=${d} prior=${p} ==="
-  # Sample using the trained checkpoint (same tag used by train_flow.py)
-  python3 train_flow.py \
-    --dataset "${d}" \
-    --prior   "${p}" \
-    --hidden  "${HIDDEN}" \
-    --lr      "${LR}" \
-    --outdir  "${OUTDIR}" \
-    --sample_only \
-    --n_samples "${NSAMPLES}" \
-    --step_size "${STEP_SIZE}" \
-    2>&1 | tee "${LOGDIR}/sample_${d}_${p}_h${HIDDEN}_lr${LR}.log"
-}
+    for p in "${PRIORS[@]}"; do
+      echo "Sampling: dataset=${d}, prior=${p}, seed=${SEED}"
 
-# ---- serial run (portable) ----
-for d in "${DATASETS[@]}"; do
-  for p in "${PRIORS[@]}"; do
-    # Skip if model already exists to make restarts cheap
-    TAG="${d}_${p}_h${HIDDEN}_lr${LR}"
-    if [[ -f "${OUTDIR}/fm_${TAG}.pt" ]]; then
-      echo "--- Found ${OUTDIR}/fm_${TAG}.pt; skipping train ---"
-    else
-      run_one "${d}" "${p}"
-    fi
-
-    # Ensure samples exist
-    if [[ ! -f "${OUTDIR}/samples_${TAG}.npy" ]]; then
-      echo "--- No samples for ${TAG}; sampling now ---"
-      python3 train_flow.py \
+      python3 sample_flow.py \
         --dataset "${d}" \
-        --prior   "${p}" \
-        --hidden  "${HIDDEN}" \
-        --lr      "${LR}" \
-        --outdir  "${OUTDIR}" \
-        --sample_only \
+        --prior "${p}" \
+        --model_path "${MODEL_PATH}" \
         --n_samples "${NSAMPLES}" \
         --step_size "${STEP_SIZE}" \
-        2>&1 | tee "${LOGDIR}/sample_${d}_${p}_h${HIDDEN}_lr${LR}.log"
-    fi
+        --seed "${SEED}" \
+        --out "${OUTDIR}/samples/samples_${d}_${p}_seed${SEED}.npy"
+    done
   done
 done
-
-# ---- manifest for downstream credal set work ----
-MANIFEST="${OUTDIR}/manifest.txt"
-: > "${MANIFEST}"
-for d in "${DATASETS[@]}"; do
-  for p in "${PRIORS[@]}"; do
-    TAG="${d}_${p}_h${HIDDEN}_lr${LR}"
-    echo "${d},${p},${OUTDIR}/fm_${TAG}.pt,${OUTDIR}/samples_${TAG}.npy" >> "${MANIFEST}"
-  done
-done
-echo "Wrote manifest to ${MANIFEST}"

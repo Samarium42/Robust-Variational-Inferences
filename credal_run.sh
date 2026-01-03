@@ -1,41 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ---- directories ----
-OUTDIR="out_fm_solver"
-LOGDIR="${OUTDIR}/logs"
-mkdir -p "${LOGDIR}"
+DATASETS=("eight_ring" "spirals" "moons")
+PRIORS=("gaussian" "gaussian_narrow" "gaussian_wide" "student_t" "ringmix")
+SEEDS=(0 1 2 3 4 5 6 7 8 9)
 
-# ---- script parameters ----
-MANIFEST="${OUTDIR}/manifest.txt"
+OUTDIR="out_fm_solver"
+mkdir -p "${OUTDIR}/credal" "${OUTDIR}/logs"
+
 STEPS=3000
 BATCH=4096
-LR=1e-3
-SEED=1337
-OUT_WEIGHTS="${OUTDIR}/credal_weights.json"
+LR=0.001
 
-# ---- log file ----
-LOGFILE="${LOGDIR}/credal_opt.log"
+for SEED in "${SEEDS[@]}"; do
+  for d in "${DATASETS[@]}"; do
+    MANIFEST="${OUTDIR}/manifest_${d}_seed${SEED}.txt"
+    : > "${MANIFEST}"
 
-echo "======================================"
-echo " Running credal-set optimisation"
-echo " Manifest: ${MANIFEST}"
-echo " Steps:    ${STEPS}"
-echo " Batch:    ${BATCH}"
-echo " LR:       ${LR}"
-echo " Output:   ${OUT_WEIGHTS}"
-echo "======================================"
+    for p in "${PRIORS[@]}"; do
+      echo "${d},${p},${OUTDIR}/fm_${d}_cond_h256_d6_lr0.001.pt,${OUTDIR}/samples_${d}_${p}_cond_h256_d6_lr0.001_seed${SEED}.npy" >> "${MANIFEST}"
+    done
 
-# ---- run the Python optimisation ----
-python3 opt_credal_kl.py \
-    --manifest "${MANIFEST}" \
-    --steps "${STEPS}" \
-    --batch "${BATCH}" \
-    --lr "${LR}" \
-    --out "${OUT_WEIGHTS}" \
-    2>&1 | tee "${LOGFILE}"
+    LOGFILE="${OUTDIR}/logs/opt_credal_${d}_seed${SEED}.log"
 
-echo "======================================"
-echo " Credal-set weights saved to ${OUT_WEIGHTS}"
-echo " Full logs: ${LOGFILE}"
-echo "======================================"
+    python3 opt_credal_kl.py \
+      --manifest "${MANIFEST}" \
+      --steps "${STEPS}" \
+      --batch "${BATCH}" \
+      --lr "${LR}" \
+      --seed "${SEED}" \
+      --out "${OUTDIR}/credal/weights_${d}_seed${SEED}.json" \
+      2>&1 | tee "${LOGFILE}"
+  done
+done
