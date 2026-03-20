@@ -109,9 +109,10 @@ def train_one_dataset(
 
         for _ in range(alpha_steps):
             T_p, mix_term, w = compute_terms()
-            loss = -(T_p.mean() - torch.log(mix_term + 1e-12))
+            # weights should MINIMISE the KL objective, critic maximises it
+            loss_alpha = (T_p.mean() - torch.log(mix_term + 1e-12))
             opt_alpha.zero_grad()
-            loss.backward()
+            loss_alpha.backward()
             opt_alpha.step()
 
         with torch.no_grad():

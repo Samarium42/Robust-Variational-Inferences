@@ -12,6 +12,8 @@ from flow_matching.solver import ODESolver
 from datasets.eight_rings import EightGaussianRingDataset
 from datasets.spirals import TwoArmSpiralsDataset
 from datasets.moons import TwoMoonsDataset
+from datasets.radon_mn import MinnesotaRadon2DDataset
+from datasets.old_faithful import OldFaithful2DDataset
 
 from priors.gaussian import GaussianPrior
 from priors.student_t import StudentTPrior
@@ -122,6 +124,18 @@ def make_dataset(name: str):
         return TwoArmSpiralsDataset(R_max=5.0, alpha=1.5, noise_std=0.1, seed=123)
     if name == "moons":
         return TwoMoonsDataset(noise=0.08, seed=42)
+    if name == "radon_mn":
+        return MinnesotaRadon2DDataset(split="train", seed=123, split_seed=0)
+    if name == "radon_mn_val":
+        return MinnesotaRadon2DDataset(split="val", seed=123, split_seed=0)
+    if name == "radon_mn_test":
+        return MinnesotaRadon2DDataset(split="test", seed=123, split_seed=0)
+    if name == "old_faithful":
+       return OldFaithful2DDataset(split="train", seed=123, split_seed=0)
+    if name == "old_faithful_val":
+       return OldFaithful2DDataset(split="val", seed=123, split_seed=0)
+    if name == "old_faithful_test":
+       return OldFaithful2DDataset(split="test", seed=123, split_seed=0)
     raise ValueError(f"unknown dataset '{name}'")
 
 
@@ -220,7 +234,7 @@ class ConditionalWrapper(ModelWrapper):
 # -------------------------
 def parse_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dataset", default="eight_ring", choices=["eight_ring", "spirals", "moons"])
+    ap.add_argument("--dataset", default="eight_ring", choices=["eight_ring", "spirals", "moons", "radon_mn", "old_faithful"])
 
     ap.add_argument("--priors", default="gaussian,gaussian_narrow,gaussian_wide,student_t,ringmix",
                     help="Comma-separated list of priors to train jointly.")
