@@ -21,21 +21,22 @@ PRINT_EVERY=200
 NSAMPLES=20000
 STEP_SIZE=0.02
 
-CREDAL_STEPS=3000
-CREDAL_BATCH=4096
-CREDAL_LR=0.001
-CREDAL_PRINT_EVERY=200
-
+# Weight-optimisation params (run_repeats)
+WEIGHT_RUNS=10
+N_FIT=8000
 N_EVAL=10000
 BANDWIDTH=0.2
 
-mkdir -p "${OUTDIR}/models" "${OUTDIR}/samples" "${OUTDIR}/credal" "${OUTDIR}/logs" "data"
+mkdir -p "${OUTDIR}/models" "${OUTDIR}/samples" "${OUTDIR}/logs" "data"
 
 echo "OUTDIR=${OUTDIR}"
 echo "TRAIN=${DATASET_TRAIN}  VAL=${DATASET_VAL}  TEST=${DATASET_TEST}"
 echo "SEED=${SEED}"
 echo "PRIORS=$(IFS=,; echo "${PRIORS[*]}")"
 
+# ----------------------------------------------------------------
+# 1. Train conditional flow model
+# ----------------------------------------------------------------
 MODEL_PATH="${OUTDIR}/models/fm_${DATASET_TRAIN}_seed${SEED}.pt"
 
 if [[ -f "${MODEL_PATH}" ]]; then
@@ -57,6 +58,9 @@ else
     2>&1 | tee "${OUTDIR}/logs/train_${DATASET_TRAIN}_seed${SEED}.log"
 fi
 
+# ----------------------------------------------------------------
+# 2. Sample from each prior
+# ----------------------------------------------------------------
 for p in "${PRIORS[@]}"; do
   SAMPLE_PATH="${OUTDIR}/samples/samples_${DATASET_TRAIN}_${p}_cond_h${HIDDEN}_d${DEPTH}_lr${LR}_seed${SEED}.npy"
 
@@ -76,6 +80,9 @@ for p in "${PRIORS[@]}"; do
   fi
 done
 
+# ----------------------------------------------------------------
+# 3. Build manifest
+# ----------------------------------------------------------------
 MANIFEST="${OUTDIR}/manifest_${DATASET_TRAIN}_seed${SEED}.txt"
 : > "${MANIFEST}"
 for p in "${PRIORS[@]}"; do
@@ -85,94 +92,66 @@ done
 echo "Wrote manifest: ${MANIFEST}"
 cat "${MANIFEST}"
 
-WEIGHTS_PATH="${OUTDIR}/credal/weights_${DATASET_TRAIN}_seed${SEED}.json"
-if [[ -f "${WEIGHTS_PATH}" ]]; then
-  echo "Found weights, skipping: ${WEIGHTS_PATH}"
-else
-  python3 opt_credal_kl.py \
-    --manifest "${MANIFEST}" \
-    --steps "${CREDAL_STEPS}" \
-    --batch "${CREDAL_BATCH}" \
-    --lr "${CREDAL_LR}" \
-    --seed "${SEED}" \
-    --print_every "${CREDAL_PRINT_EVERY}" \
-    --out "${WEIGHTS_PATH}" \
-    2>&1 | tee "${OUTDIR}/logs/opt_${DATASET_TRAIN}_seed${SEED}.log"
-fi
+# ----------------------------------------------------------------
+# 4. Weight optimisation — direct NLL, all algorithms
+#    (replaces opt_credal_kl.py which used a critic-based
+#     adversarial lower bound — wrong algorithm vs write-up)
+# ----------------------------------------------------------------
+WEIGHT_OUT="${OUTDIR}/weight_experiments"
 
-python3 - <<PY
-import os, json
-import numpy as np
-from sklearn.neighbors import KernelDensity
-from train_flow import make_dataset
+echo ""
+echo "Running weight optimisation (all algorithms, ${WEIGHT_RUNS} runs)..."
 
-OUTDIR = "${OUTDIR}"
-DATASET_TRAIN = "${DATASET_TRAIN}"
-DATASET_VAL = "${DATASET_VAL}"
-DATASET_TEST = "${DATASET_TEST}"
-HIDDEN = ${HIDDEN}
-DEPTH = ${DEPTH}
-LR = ${LR}
-SEED = ${SEED}
-N_EVAL = ${N_EVAL}
-BANDWIDTH = ${BANDWIDTH}
+python3 -m weight_opt.run_repeats \
+  --manifest "${MANIFEST}" \
+  --train_dataset "${DATASET_TRAIN}" \
+  --val_dataset "${DATASET_VAL}" \
+  --test_dataset "${DATASET_TEST}" \
+  --out_root "${WEIGHT_OUT}" \
+  --run_name "seed${SEED}" \
+  --seed_base "${SEED}" \
+  --runs "${WEIGHT_RUNS}" \
+  --bandwidth "${BANDWIDTH}" \
+  --n_fit "${N_FIT}" \
+  --n_eval "${N_EVAL}" \
+  2>&1 | tee "${OUTDIR}/logs/weight_opt_${DATASET_TRAIN}_seed${SEED}.log"
 
-weights_path = os.path.join(OUTDIR, "credal", f"weights_{DATASET_TRAIN}_seed{SEED}.json")
-with open(weights_path) as f:
-    wobj = json.load(f)
+# ----------------------------------------------------------------
+# 5. Print summary
+# ----------------------------------------------------------------
+echo ""
+echo "============================================"
+echo "Results: ${DATASET_TRAIN} (seed ${SEED})"
+echo "============================================"
 
-if DATASET_VAL in wobj:
-    priors = wobj[DATASET_VAL]["priors"]
-    weights = wobj[DATASET_VAL]["weights"]
-else:
-    raise ValueError(f"Expected key {DATASET_VAL} in {weights_path}. Keys: {list(wobj.keys())}")
+python3 - <<'PY'
+import os, csv, glob
 
-def load_samples(prior_name: str):
-    fname = f"samples_{DATASET_TRAIN}_{prior_name}_cond_h{HIDDEN}_d{DEPTH}_lr{LR}_seed{SEED}.npy"
-    path = os.path.join(OUTDIR, "samples", fname)
-    return np.load(path)
+weight_out = os.environ.get("WEIGHT_OUT", "out_fm_solver/weight_experiments")
+candidates = glob.glob(os.path.join(weight_out, "*_repeats_seed0", "aggregate.csv"))
+if not candidates:
+    candidates = glob.glob(os.path.join(weight_out, "*", "aggregate.csv"))
 
-def sample_data(dist, n):
-    x = dist.sample(n)
-    if hasattr(x, "cpu"):
-        x = x.cpu().numpy()
-    return x
+if not candidates:
+    print("ERROR: No aggregate.csv found. Check weight_opt log.")
+    exit(1)
 
-def estimate_nll(samples, data_dist, n_eval=N_EVAL, bandwidth=BANDWIDTH):
-    kde = KernelDensity(kernel="gaussian", bandwidth=bandwidth).fit(samples)
-    x_eval = sample_data(data_dist, n_eval)
-    log_q = kde.score_samples(x_eval)
-    return float(-log_q.mean())
+agg_csv = sorted(candidates)[-1]
+per_run_csv = os.path.join(os.path.dirname(agg_csv), "per_run.csv")
 
-Ptest = make_dataset(DATASET_TEST)
+print(f"Reading: {agg_csv}\n")
+print(f"{'Algorithm':<16s}  {'Test NLL mean':>14s}  {'Test NLL std':>14s}  {'Val NLL mean':>14s}")
+print("-" * 64)
 
-nlls = {}
-for p in priors:
-    nlls[p] = estimate_nll(load_samples(p), Ptest)
+with open(agg_csv) as f:
+    for row in csv.DictReader(f):
+        print(
+            f"{row['algo']:<16s}  "
+            f"{float(row['nll_test_mean']):>14.6f}  "
+            f"{float(row['nll_test_std']):>14.6f}  "
+            f"{float(row['nll_val_mean']):>14.6f}"
+        )
 
-best_p = min(nlls, key=nlls.get)
-best_single = nlls[best_p]
-
-mix_parts = []
-for p, w in zip(priors, weights):
-    samp = load_samples(p)
-    n = max(1, int(w * len(samp)))
-    mix_parts.append(samp[:n])
-mix_samples = np.vstack(mix_parts)
-mix_nll = estimate_nll(mix_samples, Ptest)
-
-print("")
-print("Per prior NLL")
-for p in sorted(nlls, key=nlls.get):
-    print(f"  {p:16s}  {nlls[p]:.6f}")
-print("")
-print("Best single")
-print(f"  {best_p:16s}  {best_single:.6f}")
-print("")
-print("Mixture")
-print(f"  mix_nll={mix_nll:.6f}")
-print("")
-print("Weights")
-for p, w in zip(priors, weights):
-    print(f"  {p:16s}  {w:.4f}")
+print(f"\nPer-run CSV : {per_run_csv}")
+print(f"Results dir : {os.path.dirname(agg_csv)}")
 PY

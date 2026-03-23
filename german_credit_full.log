@@ -1,0 +1,8 @@
+============================================
+German Credit BLR — End-to-End
+============================================
+OUTDIR=out_fm_solver
+PROBLEM=german_credit
+PRIORS=gaussian,gaussian_wide,cauchy,laplace,student_t
+SEED=0
+
