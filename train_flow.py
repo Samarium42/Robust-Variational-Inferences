@@ -136,6 +136,16 @@ def make_dataset(name: str):
        return OldFaithful2DDataset(split="val", seed=123, split_seed=0)
     if name == "old_faithful_test":
        return OldFaithful2DDataset(split="test", seed=123, split_seed=0)
+    if name == "hybrid":
+        class HybridDataset:
+            def __init__(self, path="out_fm_solver_hybrid/hybrid.npy"):
+                self.X = torch.from_numpy(np.load(path)).float()
+
+            def sample(self, n):
+                idx = torch.randint(0, self.X.shape[0], (n,))
+                return self.X[idx]
+
+        return HybridDataset()   
     raise ValueError(f"unknown dataset '{name}'")
 
 
@@ -234,7 +244,7 @@ class ConditionalWrapper(ModelWrapper):
 # -------------------------
 def parse_args():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dataset", default="eight_ring", choices=["eight_ring", "spirals", "moons", "radon_mn", "old_faithful"])
+    ap.add_argument("--dataset", default="eight_ring", choices=["eight_ring", "spirals", "moons", "radon_mn", "old_faithful", "hybrid"])
 
     ap.add_argument("--priors", default="gaussian,gaussian_narrow,gaussian_wide,student_t,ringmix",
                     help="Comma-separated list of priors to train jointly.")

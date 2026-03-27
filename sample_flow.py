@@ -13,7 +13,7 @@ def parse_args():
     ap.add_argument(
         "--dataset",
         default="eight_ring",
-        choices=["eight_ring", "spirals", "moons", "radon_mn", "old_faithful"],
+        choices=["eight_ring", "spirals", "moons", "radon_mn", "old_faithful", "hybrid"],
     )
     ap.add_argument(
         "--prior",

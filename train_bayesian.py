@@ -1,25 +1,3 @@
-"""
-train_bayesian.py — Flow matching training for Bayesian inference problems.
-
-Key difference from train_flow.py:
-  - The target distribution x1 is PRIOR-DEPENDENT (each prior has its own posterior)
-  - input_dim is inferred from the problem, not hardcoded to 2
-  - Priors come from the problem class, not from make_prior()
-
-Usage:
-    python train_bayesian.py \
-        --problem german_credit \
-        --priors gaussian,gaussian_wide,cauchy,laplace,student_t \
-        --steps 8000 --batch 1024 --hidden 256 --depth 6 \
-        --seed 0 --outdir out_fm_solver
-
-Then sample:
-    python train_bayesian.py \
-        --problem german_credit --sample_only \
-        --prior gaussian --model_path out_fm_solver/models/fm_german_credit_seed0.pt \
-        --n_samples 20000 --seed 0 --outdir out_fm_solver
-"""
-
 import argparse
 import os
 import random

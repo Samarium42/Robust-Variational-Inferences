@@ -1,0 +1,7 @@
+Method,Type,Pred-LL (test),ECE,Brier
+student_t,Single Prior,-0.49871,0.0468,0.1651
+cauchy,Single Prior,-0.49894,0.0553,0.1651
+Credal Mixture,Credal (PGD),-0.4998,0.0518,0.1655
+gaussian,Single Prior,-0.5002,0.053,0.1657
+gaussian_wide,Single Prior,-0.50025,0.0587,0.1657
+laplace,Single Prior,-0.50085,0.0688,0.1661

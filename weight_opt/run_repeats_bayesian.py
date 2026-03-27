@@ -1,23 +1,3 @@
-"""
-weight_opt/run_repeats_bayesian.py
-
-Weight optimisation for Bayesian inference problems.
-
-Same algorithms as run_repeats.py, but instead of KDE log-densities,
-the logpk matrix is computed from predictive log-likelihoods:
-
-    logpk[i, k] = log [ (1/S) Σ_s p(y_i | x_i, θ_{k,s}) ]
-
-This means all 8 weight-optimisation algorithms (EM, mirror descent,
-Frank-Wolfe, etc.) work unchanged — they just see a different logpk.
-
-Usage:
-    python -m weight_opt.run_repeats_bayesian \
-        --problem german_credit \
-        --outdir out_fm_solver \
-        --seed 0 \
-        --runs 10
-"""
 
 import argparse
 import csv

@@ -1,23 +1,4 @@
-"""
-evaluation_predictive.py — Evaluate flow-based posteriors via predictive log-likelihood.
 
-Replaces KDE-NLL evaluation (which fails in >5D) with proper Bayesian predictive
-evaluation on held-out data:
-
-    pred_LL = (1/N) Σ_i log [ (1/S) Σ_s p(y_i | x_i, θ_s) ]
-
-For each weight-optimisation algorithm, the mixture predictive LL is:
-    pred_LL_mix = (1/N) Σ_i log [ Σ_k w_k · (1/S_k) Σ_s p(y_i | x_i, θ_{k,s}) ]
-
-Reads sample .npy files produced by train_bayesian.py and weight files
-produced by weight_opt/run_repeats.py.
-
-Usage:
-    python evaluation_predictive.py \
-        --problem german_credit \
-        --outdir out_fm_solver \
-        --seed 0
-"""
 
 import argparse
 import csv

@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# =============================================================
-# German Credit Bayesian Logistic Regression — End-to-End
-#
-# ~25D problem with genuinely contentious prior choices.
-# Uses train_bayesian.py (prior-dependent targets) and
-# predictive log-likelihood evaluation (not KDE-NLL).
-# =============================================================
 
 OUTDIR="out_fm_solver"
 SEED=0

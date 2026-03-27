@@ -1,28 +1,3 @@
-"""
-Bayesian logistic regression on German credit data.
-
-Provides reference posterior samples (via HMC) under each of several priors
-on the regression coefficients. This gives a ~24D problem where prior choice
-is genuinely contentious in the literature.
-
-Priors included:
-  - gaussian       : N(0, 1)     — weakly informative
-  - gaussian_wide  : N(0, 10)    — diffuse / vague
-  - cauchy         : Cauchy(0, 2.5) — Gelman et al recommendation
-  - laplace        : Laplace(0, 1)  — L1-like / sparsity-inducing
-  - student_t      : StudentT(df=3, scale=2.5) — robust heavy-tailed
-
-Usage:
-    problem = GermanCreditBLR(data_dir="data", seed=0)
-    problem.ensure_posteriors()  # run HMC (cached to disk)
-
-    # For flow training:
-    x1 = problem.sample_posterior("gaussian", 1024)     # target (prior-dependent)
-    x0 = problem.sample_prior("gaussian", 1024)         # source
-
-    # For evaluation:
-    pred_ll = problem.predictive_log_lik(theta_samples, split="test")
-"""
 
 import os
 import math
