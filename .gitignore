@@ -2,3 +2,6 @@
 __pycache__/
 __pycache__/
 venv_rob_vi/
+venv_rob_vi/
+*.pt
+out_fm_solver*/
