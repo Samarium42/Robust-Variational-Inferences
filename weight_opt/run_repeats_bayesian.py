@@ -1,4 +1,3 @@
-
 import argparse
 import csv
 import os
@@ -24,6 +23,7 @@ from weight_opt.utils import (
 )
 
 from datasets.german_credit import GermanCreditBLR
+from train_bayesian import make_problem
 
 
 def compute_predictive_logpk(
@@ -150,8 +150,8 @@ def main():
     prior_names = [p.strip() for p in args.priors.split(",")]
 
     # Load problem
-    problem = GermanCreditBLR(data_dir=args.data_dir, seed=args.seed,
-                              max_train=args.max_train)
+    problem = make_problem(args.problem, data_dir=args.data_dir, seed=args.seed,
+                           max_train=args.max_train)
 
     # Load flow samples
     sample_arrays = {}

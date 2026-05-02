@@ -1,0 +1,85 @@
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  every node/.style = {font=\small},
+  inbox/.style  = {rectangle, rounded corners=5pt,
+                   draw=violet!80!black, fill=violet!10,
+                   text width=3.0cm, minimum height=1.6cm,
+                   align=center},
+  stepbox/.style = {rectangle, rounded corners=5pt,
+                    draw=#1!80!black, fill=#1!10,
+                    text width=3.2cm, minimum height=1.8cm,
+                    align=center},
+  outbox/.style  = {rectangle, rounded corners=5pt,
+                    draw=violet!80!black, fill=violet!15,
+                    text width=5.5cm, minimum height=1.4cm,
+                    align=center},
+  arr/.style = {-{Stealth[length=5pt]}, thick, gray!60!black},
+]
+
+%% ══ ROW 1: Cache → Sample → Interpolate ════════════════════════════════
+\node[inbox] at (0, 0) (cache) {
+  \textbf{Posterior Cache}\\[2pt]
+  $\{\theta_k^{(s)}\}$ per prior\\
+  $K$ components
+};
+
+\node[stepbox=blue] at (4.2, 0) (sample) {
+  \textbf{Sample batch}\\[2pt]
+  $k \sim \mathcal{U}\{1..K\}$\\
+  $z_1 \sim \mathrm{cache}_k$\\
+  $z_0 \sim \pi_k$,\ clip $[-15,15]$\\
+  $t \sim \mathcal{U}[0,1]$
+};
+
+\node[stepbox=blue] at (8.4, 0) (interp) {
+  \textbf{Interpolate}\\[2pt]
+  $z_t = (1{-}t)z_0 + tz_1$\\[4pt]
+  target: $u = z_1 - z_0$
+};
+
+\draw[arr] (cache)  -- (sample);
+\draw[arr] (sample) -- (interp);
+
+%% ══ ROW 2: VelocityResNet → Loss → Optimiser ═══════════════════════════
+\node[stepbox=teal] at (8.4, -4.5) (net) {
+  \textbf{VelocityResNet}\\[2pt]
+  $v_\theta(z_t,\,t,\,k)$\\[2pt]
+  FiLM conditioning\\
+  on prior index $k$
+};
+
+\node[stepbox=red] at (4.2, -4.5) (loss) {
+  \textbf{Huber Loss}\\[2pt]
+  $\mathcal{L} = \bigl\|v_\theta(z_t,t,k)$\\[2pt]
+  $\quad - (z_1-z_0)\bigr\|_H$
+};
+
+\node[stepbox=teal] at (0, -4.5) (opt) {
+  \textbf{AdamW}\\[2pt]
+  lr $= 10^{-3}$,\ wd $= 10^{-2}$\\
+  grad clip $= 1.0$\\[3pt]
+  {\footnotesize\itshape repeat 6{,}000 steps}
+};
+
+%% ── Vertical: interp → net ────────────────────────────────────────────────
+\draw[arr] (interp.south) -- (net.north);
+
+%% ── Row 2 horizontal arrows ──────────────────────────────────────────────
+\draw[arr] (net)  -- (loss);
+\draw[arr] (loss) -- (opt);
+
+%% ══ OUTPUT: straight down from opt ══════════════════════════════════════
+\node[outbox] at (4.2, -7.4) (trained) {
+  \textbf{Trained} $v_\theta(z,t,k)$:\\
+  shared backbone, $K$ posteriors
+};
+
+\draw[arr] (opt.south) -- ++(0,-0.5) -| (trained.west);
+
+\end{tikzpicture}
+\caption{Phase 2: Conditional Flow Matching training. A single shared
+         \texttt{VelocityResNet} is trained jointly across all $K$ priors
+         using the simulation-free CFM objective.}
+\label{fig:diagram_cfm}
+\end{figure}

@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99e (TeX Live 2026)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: report.aux
+The style file: apalike.bst
+A level-1 auxiliary file: chapter1.aux
+A level-1 auxiliary file: chapter2.aux
+A level-1 auxiliary file: chapter3.aux
+A level-1 auxiliary file: chapter4.aux
+A level-1 auxiliary file: chapter5.aux
+Database file #1: references.bib
+Warning--I didn't find a database entry for "lipman2022;liu2022"
+Warning--empty journal in liu2022
+Warning--empty journal in wenzel2020
+You've used 52 entries,
+            1935 wiz_defined-function locations,
+            764 strings with 11711 characters,
+and the built_in function-call counts, 21103 in all, are:
+= -- 2035
+> -- 911
+< -- 41
++ -- 321
+- -- 303
+* -- 1733
+:= -- 3645
+add.period$ -- 165
+call.type$ -- 52
+change.case$ -- 398
+chr.to.int$ -- 52
+cite$ -- 54
+duplicate$ -- 860
+empty$ -- 1505
+format.name$ -- 385
+if$ -- 4173
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 63
+newline$ -- 268
+num.names$ -- 164
+pop$ -- 437
+preamble$ -- 1
+purify$ -- 407
+quote$ -- 0
+skip$ -- 594
+stack$ -- 0
+substring$ -- 1264
+swap$ -- 118
+text.length$ -- 13
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 288
+warning$ -- 2
+while$ -- 163
+width$ -- 0
+write$ -- 687
+(There were 3 warnings)

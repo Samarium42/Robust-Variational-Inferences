@@ -1,1 +1,20 @@
 \addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Credal sets used for each experimental setting. All Gaussian priors are isotropic. $\sigma $ denotes the standard deviation, $\nu $ the degrees of freedom for Student-T, and $b$ the scale for Laplace.}}{46}{table.3.1}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Common architecture and optimiser settings across all experiments.}}{47}{table.3.2}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces FiLM block configuration.}}{50}{table.3.3}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Dataset-specific configurations. All other parameters follow Table~\ref {tab:common_arch}.}}{51}{table.3.4}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces HMC configuration for posterior sample generation. The same settings are used for all priors and datasets.}}{52}{table.3.5}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Training configuration for the conditional flow matching model.}}{55}{table.3.6}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Credal weight optimisation algorithms. All algorithms optimise the same held-out NLL objective over $\Delta _{K-1}$.}}{60}{table.3.7}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Test NLL per seed and mean for all algorithms on German Credit low-data regime ($n = 75$, 5 seeds). Lower is better.}}{63}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Regret (NLL minus oracle NLL) per seed for all algorithms. Max and mean regret across 5 seeds reported. Lower is better.}}{63}{table.4.2}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Per-prior test predictive log-likelihood per seed (German Credit, $n = 75$). Bold indicates the best prior for each seed.}}{64}{table.4.3}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Test NLL for all algorithms on German Credit full-data regime ($n = 700$, 10 runs). All algorithms are within 0.002 nats.}}{65}{table.4.4}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Test NLL for all algorithms on Minnesota Radon (10 seeds). All principled algorithms are within 0.001 nats of best-single.}}{66}{table.4.5}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Speed comparison between flow matching and CNF baseline on German Credit low-data regime ($n = 75$, seed 0, 6{,}000 steps, identical \texttt {VelocityResNet} architecture). CNF total time is estimated from per-step timing; the CNF was not trained to convergence.}}{72}{table.4.6}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Mean test KDE-NLL (lower is better) across 10 seeds for synthetic 2D datasets. Gap is best-single minus credal (coord.) KDE-NLL; positive means credal is better.}}{74}{table.4.7}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Summary of hypothesis test outcomes.}}{75}{table.4.8}%
+\addvspace {10\p@ }

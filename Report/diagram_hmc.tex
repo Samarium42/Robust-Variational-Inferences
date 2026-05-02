@@ -1,0 +1,107 @@
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  every node/.style = {font=\small},
+  inbox/.style  = {rectangle, rounded corners=5pt,
+                   draw=orange!80!black, fill=orange!10,
+                   text width=5.5cm, minimum height=1.4cm,
+                   align=center},
+  stepbox/.style = {rectangle, rounded corners=5pt,
+                    draw=teal!80!black, fill=teal!10,
+                    text width=5.5cm, minimum height=1.4cm,
+                    align=center},
+  warmbox/.style = {rectangle, rounded corners=5pt,
+                    draw=red!70!black, fill=red!8,
+                    text width=5.5cm, minimum height=1.2cm,
+                    align=center},
+  outbox/.style  = {rectangle, rounded corners=5pt,
+                    draw=violet!80!black, fill=violet!10,
+                    text width=7.0cm, minimum height=1.4cm,
+                    align=center},
+  mathbox/.style = {rectangle, rounded corners=4pt,
+                    draw=blue!60!black, fill=blue!6,
+                    text width=5.2cm, minimum height=1.8cm,
+                    align=center},
+  arr/.style = {-{Stealth[length=5pt]}, thick, gray!60!black},
+]
+
+%% ── Single input box ──────────────────────────────────────────────────────
+\node[inbox] at (0, 0) (input) {
+  $\mathcal{D}=\{x_i\}_{i=1}^N$,\quad
+  $\Pi=\{\pi_1,\ldots,\pi_K\}$\\[3pt]
+  {\itshape for each prior $\pi_k$, $k = 1 \ldots K$}
+};
+
+%% ── Steps ─────────────────────────────────────────────────────────────────
+\node[stepbox] at (0, -2.0) (init) {
+  \textbf{Step 1: Initialise}\\[2pt]
+  $\theta^{(0)} = \mathbf{0}$
+};
+
+\node[stepbox] at (0, -3.8) (mom) {
+  \textbf{Step 2: Sample momentum}\\[2pt]
+  $p \sim \mathcal{N}(0, I)$
+};
+
+\node[stepbox] at (0, -5.9) (leap) {
+  \textbf{Step 3: Leapfrog integration}\\[3pt]
+  $L = 15$ steps,\quad $\varepsilon = 0.005$\\[2pt]
+  $\tilde{\theta} = \theta + \varepsilon p$\qquad
+  $\tilde{p} = p - \varepsilon \nabla U(\theta)$
+};
+
+\node[stepbox] at (0, -8.1) (mh) {
+  \textbf{Step 4: MH Accept/Reject}\\[3pt]
+  $\alpha = \min\!\left(1,\;
+  \dfrac{e^{-H(\tilde{\theta},\tilde{p})}}
+        {e^{-H(\theta,p)}}\right)$
+};
+
+\node[warmbox] at (0, -10.0) (warmup) {
+  \textbf{Warmup:} 1{,}000 steps discarded\\
+  then collect 3{,}000 samples
+};
+
+%% ── Hamiltonian definition — right side annotation ────────────────────────
+\node[mathbox] at (5.8, -5.9) (Udef) {
+  $U(\theta) = -\log p(\theta \mid x, \pi_k)$\\[4pt]
+  $= -\log\mathcal{L}(x \mid \theta)
+     - \log\pi_k(\theta)$\\[4pt]
+  $H(\theta, p) = U(\theta) + \tfrac{1}{2}\|p\|^2$
+};
+
+%% ── Output ────────────────────────────────────────────────────────────────
+\node[outbox] at (0, -11.8) (cache) {
+  \textbf{Posterior Cache}\\[3pt]
+  $\bigl\{\theta_k^{(s)}\bigr\}_{s=1}^{3000}$
+  saved to disk per prior $\pi_k$\\
+  reused across all training runs
+};
+
+%% ── Main vertical arrows ─────────────────────────────────────────────────
+\draw[arr] (input)  -- (init);
+\draw[arr] (init)   -- (mom);
+\draw[arr] (mom)    -- (leap);
+\draw[arr] (leap)   -- (mh);
+\draw[arr] (mh)     -- (warmup);
+\draw[arr] (warmup) -- (cache);
+
+%% ── Loop-back arrow on LEFT side: accept → back to momentum ──────────────
+\draw[arr, dashed]
+  (mh.west) -- ++(-1.4, 0)
+             -- ++(0, 4.3)
+             -- (mom.west);
+\node[font=\scriptsize\itshape, gray!55!black,
+      align=center, text width=1.8cm]
+  at (-5, -5.9) {accept:\\$\theta \leftarrow \tilde{\theta}$\\repeat};
+
+%% ── Annotation connector ─────────────────────────────────────────────────
+\draw[gray!40!black, dashed, thin]
+  (leap.east) -- (Udef.west);
+
+\end{tikzpicture}
+\caption{Phase 1: HMC posterior sampling. For each prior $\pi_k \in \Pi$,
+         3{,}000 posterior samples are generated after a 1{,}000-step warmup
+         and cached to disk for reuse across all training runs.}
+\label{fig:diagram_hmc}
+\end{figure}

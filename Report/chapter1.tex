@@ -1,21 +1,322 @@
 \chapter{Introduction}
 \label{cha:intro}
 
-\section{Background and motivation}
-Bayesian inference provides a rigorous framework for updating beliefs about model parameters in the light of observed data, yet the uncertainty it quantifies is not immune to uncertainty itself. This is the problem of second-order uncertainty, which arises because Bayesian inference carries a foundational assumption that the prior distribution is known and correctly specified. When multiple priors are equally plausible, committing to a single one is epistemically insufficient and can lead to overconfident inferences. The framework is precise about uncertainty over parameters but it fails to capture the uncertainty about the choice of the prior which precedes inference at the level of modelling itself. This problem has been recognised in the philosophy of probability since at least the 1960s, formalised under the study of imprecise probabilities and credal sets, yet it has remained largely intractable to address in modern probabilistic machine learning. The availability of large datasets and powerful computational resources has led to a focus on the scalability of inference algorithms, but the problem of second-order uncertainty has been largely neglected. \\
+\section{Background and Motivation}
+Bayesian inference provides a rigorous framework for updating beliefs 
+about model parameters in the light of observed data, yet the uncertainty 
+it quantifies is not immune to uncertainty itself. This is the problem of 
+second-order uncertainty, which arises because Bayesian inference carries a 
+foundational assumption that the prior distribution is known and correctly 
+specified. When multiple priors are equally plausible, committing to a single 
+one is epistemically insufficient and can lead to overconfident inferences. 
+The framework is precise about uncertainty over parameters but it fails to 
+capture the uncertainty about the choice of the prior which precedes inference 
+at the level of modelling itself. This problem has been recognised in the 
+philosophy of probability since at least the 1960s, formalised under the 
+study of imprecise probabilities and credal sets. Imprecise probability theory 
+replaces the single prior distribution with a credal set, a convex set of 
+distributions representing the range of plausible beliefs, and asks what 
+conclusions are robust across the entire set rather than what is optimal 
+under a single prior \citep{walley1991}\citep{wheeler2022}. This is a philosophically 
+distinct response to the problem of second-order uncertainty. Rather than 
+resolving prior uncertainty by collapsing it to a point, the framework carries 
+that uncertainty forward explicitly into the inferential conclusions. The 
+computational challenges of working with sets of distributions are formidable, 
+however, and the focus on scalability in modern machine learning has led to 
+the problem of second-order uncertainty being largely neglected.
 
-Prior sensitivity is a routine challenge in Bayesian inference, and when the data is scarce, the likelihood is not sufficiently informative to overwhelm the influence of the prior and posterior remains sensitive to the initial modelling choices. In settings such as healthcare, ecological modelling or scientific parameter estimation, data is expensive to obtain or just inherently limited; two practitioners using equally defensible priors can arrive at substantially different posteriors and therefore different conclusions. \\
+Prior sensitivity is a routine challenge in Bayesian inference. When data 
+is scarce, the likelihood is not sufficiently informative to overwhelm the 
+influence of the prior and the posterior remains sensitive to the initial 
+modelling choices. In settings such as healthcare, ecological modelling, or 
+scientific parameter estimation, data is expensive to obtain or inherently 
+limited; two practitioners using equally defensible priors can arrive at 
+substantially different posteriors and therefore different conclusions. In a 
+clinical trial setting, for instance, a sceptical prior and an optimistic 
+prior over treatment efficacy can produce posteriors that disagree 
+substantially about whether a drug should be recommended, not because the 
+data is ambiguous, but because the prior is doing significant inferential 
+work that is never formally acknowledged \citep{berger1994}. This sensitivity 
+is not confined to small data or traditional statistical settings. Recent 
+work has shown that prior choice remains consequential in deep Bayesian 
+models; standard priors used in Bayesian neural networks are poorly 
+calibrated and performance is sensitive to prior specification even at 
+scale \citep{fortuin2021}, and cold posteriors, which correspond to 
+implicitly rescaled priors, have been shown to outperform standard 
+posteriors in deep learning settings \citep{wenzel2020}. Prior 
+uncertainty is therefore not a historical concern that modern methods 
+have resolved but an active and open problem in probabilistic machine 
+learning.
 
-Variational Inference (VI) has emerged as a powerful tool for Bayesian computation, offering a scalable alternative to Markov Chain Monte Carlo (MCMC) methods. However, standard VI inference inherits the same foundational limitations of Bayesian inference, and it is not designed to account for the uncertainty about the choice of the prior. Credal sets offer a natural remedy by allowing us to consider sets of priors instead of a single one, we obtain a corresponding set of posteriors, and the inferential question shifts from finding the best approximation to a single target to asking what can be concluded robustly across the entire set. But the computational challenges of working with sets of distributions are formidable. \\
+Variational Inference (VI) has emerged as a powerful tool for Bayesian 
+computation, offering a scalable alternative to Markov Chain Monte Carlo 
+(MCMC) methods. However, standard VI inherits the same foundational 
+limitation: it approximates a single posterior under a fixed prior, leaving 
+second-order uncertainty unaddressed. VI is nevertheless a natural framework 
+for operationalising credal sets at scale: rather than running a separate 
+inference procedure for each candidate prior independently, one can train a 
+family of variational posteriors jointly and combine them into a credal 
+mixture, directly representing the uncertainty that a single posterior cannot 
+capture. The computational challenge is making this tractable; training 
+expressive posterior approximations across a set of priors simultaneously 
+demands a flexible and scalable variational family.
 
-Recent advances in normalising flows and their continuous-time generalisation through neural ordinary differential equations (Chen et al., 2018) have made expressive posterior approximation tractable. Flow matching (Lipman et al., 2022) represents a further step, replacing the computationally expensive log-determinant evaluations required by classical normalising flows with a direct regression objective over a learned velocity field, making training a shared posterior approximation across multiple priors substantially more scalable. \\
+Recent advances in normalising flows and their continuous-time generalisation 
+through neural ordinary differential equations \citep{chen2018} have made 
+expressive posterior approximation tractable. Flow matching \citep{lipman2022} represents a further step, replacing the computationally expensive 
+log-determinant evaluations required by classical normalising flows with a 
+direct regression objective over a learned velocity field. Crucially, the 
+velocity field can be conditioned on auxiliary information, in this case a 
+discrete prior index, at minimal additional cost, allowing a single shared 
+model to approximate posteriors across all candidate priors simultaneously. 
+This makes flow matching particularly well suited to the credal mixture 
+setting and addresses the computational challenge directly.
 
-This thesis investigates whether credal mixtures of flow-based posteriors can provide robust inference under prior uncertainty. The approach is grounded in a classical result from information theory: the KL divergence is convex in its second argument, which guarantees in principle that a mixture over a set of posteriors performs at least as well as the best individual component (Cover and Thomas, 2006). Whether this guarantee remains empirically visible under deep variational approximation, and what architectural and methodological conditions are required for it to hold, is the central question this work addresses.
+This thesis investigates whether credal mixtures of flow-based posteriors 
+can provide robust inference under prior uncertainty. The approach is grounded 
+in a classical result from information theory: the KL divergence is convex 
+in its second argument, which guarantees in principle that a mixture over a 
+set of posteriors performs at least as well as the best individual component 
+\citep{cover2006}. Whether this guarantee remains empirically visible 
+under deep variational approximation, and what architectural and methodological 
+conditions are required for it to hold, is the central question this work 
+addresses.
 
-\section{Problem statement and objectives}
+\section{Existing Approaches to Prior Robustness}
 
-The central problem this thesis addresses is the gap between the theoretical promise of credal mixture inference and their empirical behaviour under deep variational approximation. While the convexity of the KL divergence guarantees that a mixture over a set of posteriors should perform atleast as well as the best individual component, it is not clear whether this guarantee remains empirically visible when using deep neural networks to approximate the posteriors. These approximations are learnt under finite data regime and the mixture weights must be estimated from the held-out data. These sources of approximation and estimation error may undermine the theoretical guarantee, and it is an open question under what conditions the robust performance of credal mixtures can be realised in practice. \\
+Several approaches have been proposed to address the problem of prior 
+sensitivity in Bayesian inference and to operationalise the concept of 
+robustness to prior uncertainty. Each offers a different perspective on 
+the problem and a different set of trade-offs, but none provides a 
+principled treatment of second-order uncertainty in the sense formalised 
+by imprecise probability theory.
 
-More concretely, the problem has two interacting components. The first is architectural: if each posterior approximation is trained independently under a different prior, there is no guarantee that the resulting approximations are comparable in quality or that their mixture is well-defined as a density. The second is statistical: even with a coherent family of approximations, estimating mixture weights using proxy objectives such as maximum mean discrepancy or adversarial divergence bounds introduces estimation noise that can cause the mixture to underperform its best component. Both failure modes were observed in preliminary experiments and motivate the specific design choices investigated in this thesis. \\
+\subsection{Epsilon-Contamination and Prior Classes}
 
-The objectives of this work are fourfold. First, to design a shared-backbone flow matching architecture conditioned on a discrete prior index, ensuring that all posterior approximations are trained within a common optimisation framework with comparable capacity. Second, to investigate likelihood-consistent mixture weight selection via held-out negative log likelihood as a principled alternative to proxy divergence objectives such as maximum mean discrepancy and adversarial KL bounds, which were found in preliminary experiments to introduce estimation noise sufficient to mask the theoretical guarantee. Third, to evaluate whether the resulting credal mixtures recover the convexity guarantee empirically, using paired per-seed comparisons to control for estimation variance. Fourth, to characterise the conditions under which the theoretical guarantee is and is not empirically visible, contributing to a broader understanding of when classical information-theoretic arguments remain reliable under deep variational approximation.
+The original formal treatment of prior robustness models the prior as 
+belonging to an epsilon-contamination class, a convex set of distributions 
+formed by mixing a baseline prior with an arbitrary contaminating 
+distribution within some neighbourhood (Berger, 1984; Insua and Ruggeri, 
+2000). Posterior bounds are then derived that hold for any prior in the 
+class, providing a formal framework for analysing the sensitivity of 
+inferences to perturbations of the prior. This is the intellectual 
+precursor to the credal set approach and establishes the core idea that 
+working with a class of priors rather than a single one is both principled 
+and tractable. The limitation is that the prior class is defined 
+analytically and the resulting posterior bounds are derived through 
+closed-form calculations, which restricts applicability to simple models 
+and low-dimensional settings. This approach does not scale to modern 
+machine learning problems with high-dimensional parameter spaces and 
+complex likelihoods.
+
+\subsection{Gamma-Minimax Decision Theory}
+
+Rather than committing to one prior, the gamma-minimax framework minimises 
+the maximum expected loss over a class of priors, producing decisions that 
+are robust to the worst-case prior within the class \citep{berger1985}. This 
+is philosophically aligned with the imprecise probability approach in that 
+it acknowledges a set of plausible priors rather than a single one. 
+However, the minimax framing collapses the set at decision time: the 
+output is a single decision that hedges against the worst case, rather 
+than a set of posteriors that carries prior uncertainty forward. The 
+second-order uncertainty is acknowledged in the decision procedure but 
+is not propagated through inference in a way that allows downstream 
+conclusions to reflect it.
+
+\subsection{Bayesian Model Averaging}
+
+Bayesian model averaging (BMA) combines a discrete set of candidate 
+models or priors by weighting each according to its marginal likelihood 
+\citep{hoeting1999}. This is the closest classical precursor to the 
+credal mixture approach and is important to engage with carefully. The 
+key distinction is that BMA uses marginal likelihood weights, which are 
+themselves computed under each model's prior and collapsed into a single 
+weighted predictive distribution. The weights are point estimates and the 
+resulting average is a single distribution rather than a credal set. There 
+is no formal commitment to representing the uncertainty across the set; 
+BMA resolves prior uncertainty by weighting rather than carrying it forward. 
+Furthermore, marginal likelihood weights can be dominated by a single model 
+when one prior fits the data substantially better, which may not reflect 
+genuine robustness across the set.
+
+\subsection{Stacking of Predictive Distributions}
+
+Stacking fits mixture weights over a set of candidate posteriors by 
+maximising held-out log predictive scores, making it the most directly 
+related existing method to the approach developed in this thesis \citep{yao2018}. Operationally, stacking shares the combination mechanism: 
+a set of posteriors is trained and weights are selected using a 
+likelihood-consistent objective. However, stacking treats the candidate 
+models as fixed and selects weights purely for predictive performance, 
+without any theoretical grounding in imprecise probability theory or the 
+KL convexity guarantee. It is a pragmatic ensemble method rather than 
+a principled treatment of second-order uncertainty. The mixture weights 
+in stacking are justified by cross-validated predictive accuracy alone; 
+in the credal mixture framework developed here, the combination is 
+grounded in the convexity of KL divergence, which provides a theoretical 
+guarantee that the mixture performs at least as well as the best 
+individual component.
+
+\subsection{Generalised Bayesian Inference}
+
+Generalised Bayesian inference replaces the likelihood in Bayes' rule 
+with a general loss function, producing a family of posteriors indexed 
+by the loss rather than a single posterior \citep{bissiri2016}. 
+Knoblauch et al. \citep{knoblauch2022} extend this framework and explicitly discuss 
+robustness to both prior and likelihood misspecification as a unified 
+problem, making this the most theoretically sophisticated modern approach 
+to Bayesian robustness. The framework implicitly defines a set of 
+plausible posteriors under different modelling assumptions, which is 
+conceptually adjacent to the credal set idea. However, it does not 
+formally invoke imprecise probability theory; it does not treat the 
+resulting set of posteriors as a credal set or ask what can be concluded 
+robustly across it. It produces alternative posteriors rather than 
+representing and propagating genuine second-order uncertainty, and it 
+does not provide a mechanism for combining posteriors across a set 
+of priors in a principled way.
+
+\subsection{Robust Divergence-Based Variational Inference}
+
+Robust divergence-based variational inference replaces the KL divergence 
+in the VI objective with a more robust alternative such as the 
+beta-divergence or gamma-divergence, achieving resistance to outliers 
+and likelihood misspecification \citep{futami2018, knoblauch2019}. While superficially related to the goal of robust inference, 
+this approach addresses a fundamentally different problem. It produces 
+a single posterior under a single prior, changing the objective function 
+to be less sensitive to data contamination but leaving the question of 
+which prior to use entirely unaddressed. A practitioner using these 
+methods still commits to one prior at the outset and obtains one 
+posterior at the end; the second-order uncertainty identified in 
+Section 1.1 is not represented, acknowledged, or propagated.
+
+\bigskip
+
+None of these approaches simultaneously satisfies three properties 
+that the present work aims to achieve: formal grounding in imprecise 
+probability theory, expressive deep variational posterior approximation, 
+and likelihood-consistent combination of posteriors under a credal set 
+of priors. The closest in terms of combination mechanism is stacking, 
+which lacks the theoretical grounding. The closest theoretically is 
+generalised Bayesian inference, which lacks both the credal set framing 
+and the combination mechanism. Imprecise probability theory is 
+philosophically distinct from all of the above: by treating the prior 
+as a credal set from the outset, it propagates uncertainty at the 
+modelling level through to the posterior, asking what can be concluded 
+robustly across all plausible priors rather than optimising under any 
+single one \citep{walley1991, wheeler2022}. This thesis operationalises 
+that commitment computationally for the first time in the setting of 
+flow-based variational inference.
+
+\section{Problem Statement}
+
+Having established that existing approaches fall short of a principled 
+treatment of second-order uncertainty, we can now state the specific 
+problem this thesis investigates more precisely. The central challenge 
+is the gap between the theoretical promise of credal mixture inference 
+and its empirical behaviour under deep variational approximation. While 
+the convexity of the KL divergence guarantees that a mixture over a 
+set of posteriors should perform at least as well as the best individual 
+component, it is not clear whether this guarantee remains empirically 
+visible when using deep neural networks to approximate the posteriors. 
+These approximations are learned under a finite data regime and the 
+mixture weights must be estimated from held-out data. These sources of 
+approximation and estimation error may undermine the theoretical 
+guarantee, and it is an open question under what conditions the robust 
+performance of credal mixtures can be realised in practice.
+
+More concretely, the problem has two interacting components. The first 
+is architectural: if each posterior approximation is trained independently 
+under a different prior, there is no guarantee that the resulting 
+approximations are comparable in quality or that their mixture is 
+well-defined as a density. The second is statistical: even with a 
+coherent family of approximations, estimating mixture weights using 
+proxy objectives such as maximum mean discrepancy or adversarial 
+divergence bounds introduces estimation noise that can cause the mixture 
+to underperform its best component. Both failure modes were observed in 
+preliminary experiments and motivate the specific design choices 
+investigated in this thesis.
+
+\section{Research Objectives}
+
+This thesis pursues four concrete objectives in response to the 
+challenges identified above.
+
+\begin{enumerate}
+    \item \textbf{Shared-backbone architecture.} Design a flow matching 
+    architecture conditioned on a discrete prior index, ensuring that 
+    all posterior approximations are trained within a common optimisation 
+    framework with comparable capacity across priors.
+
+    \item \textbf{Likelihood-consistent weight selection.} Investigate 
+    held-out negative log likelihood as a principled alternative to proxy 
+    divergence objectives such as maximum mean discrepancy and adversarial 
+    KL bounds, which were found in preliminary experiments to introduce 
+    estimation noise sufficient to mask the theoretical guarantee. Unlike 
+    proxy objectives, held-out NLL directly approximates the KL objective 
+    underpinning the convexity guarantee, ensuring alignment between the 
+    selection criterion and the theoretical motivation.
+
+    \item \textbf{Empirical evaluation of the convexity guarantee.} 
+    Evaluate whether the resulting credal mixtures recover the KL 
+    convexity guarantee empirically, using paired per-seed comparisons 
+    to control for estimation variance across random initialisations.
+
+    \item \textbf{Characterisation of failure conditions.} Identify the 
+    architectural and statistical conditions under which the theoretical 
+    guarantee is and is not empirically visible, contributing to a broader 
+    understanding of when classical information-theoretic arguments remain 
+    reliable under deep variational approximation.
+\end{enumerate}
+
+Taken together, these objectives aim to bridge the gap between the 
+theoretical commitments of imprecise probability theory and their 
+empirical behaviour under deep variational approximation, contributing 
+to a broader understanding of when information-theoretic guarantees 
+survive the transition from exact to approximate inference.
+
+\section{Report Structure}
+
+The remainder of this thesis is organised as follows.
+
+Chapter~2 presents the theoretical foundations 
+underpinning the approach. It introduces Bayesian 
+inference and variational inference, formalises 
+imprecise probability theory and credal sets, and 
+establishes the KL convexity guarantee that motivates 
+the credal mixture framework. It then develops the 
+normalising flow and flow matching machinery, and 
+proves the approximate mixture bound that characterises 
+the conditions under which the guarantee survives 
+flow-based approximation and finite held-out weight 
+selection.
+
+Chapter~3 describes the methodology. It formalises 
+the three research hypotheses and the two-regime 
+experimental design, introduces the datasets and 
+credal sets used for each problem, and describes the 
+shared-backbone \texttt{VelocityResNet} architecture 
+and its prior conditioning mechanism. The two-phase 
+training procedure, the eight credal weight 
+optimisation algorithms compared, and the full 
+evaluation protocol are also defined here.
+
+Chapter~4 presents the results and discussion. 
+The primary evaluation on German Credit in the 
+low-data regime confirms H1 and H3, demonstrating 
+that the credal mixture achieves near-oracle 
+worst-case regret and that EM is the most consistent 
+weight optimisation algorithm. The full-data null 
+control confirms H2. An architectural ablation 
+validates the shared-backbone design, and 
+supplementary analyses examine prior sensitivity, 
+weight stability, leave-one-prior-out behaviour, 
+calibration, and optimiser convergence.Section~\ref{sec:fm_vs_cnf} presents a 
+speed comparison between the flow matching 
+training objective and a CNF baseline using 
+the same architecture, validating the 
+computational motivation of Section~2.5.
+
+Chapter~5 concludes the thesis with a summary of 
+contributions, an acknowledgement of limitations, 
+and directions for future work including continuous 
+credal sets, theoretical bounds on the approximation 
+gap, and extension to Bayesian neural networks.

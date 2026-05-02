@@ -1,7 +1,102 @@
-\contentsline {chapter}{Abstract}{5}{}%
-\contentsline {chapter}{Declaration}{6}{}%
-\contentsline {chapter}{Copyright}{7}{}%
-\contentsline {chapter}{Acknowledgements}{8}{}%
-\contentsline {chapter}{\numberline {1}Introduction}{9}{}%
-\contentsline {section}{\numberline {1.1}Background and motivation}{9}{}%
-\contentsline {section}{\numberline {1.2}Problem statement and objectives}{10}{}%
+\contentsline {chapter}{Abstract}{10}{chapter*.4}%
+\contentsline {chapter}{Declaration}{11}{chapter*.5}%
+\contentsline {chapter}{Copyright}{12}{chapter*.6}%
+\contentsline {chapter}{Acknowledgements}{13}{chapter*.7}%
+\contentsline {chapter}{\numberline {1}Introduction}{14}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background and Motivation}{14}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Existing Approaches to Prior Robustness}{16}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Epsilon-Contamination and Prior Classes}{16}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Gamma-Minimax Decision Theory}{17}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Bayesian Model Averaging}{17}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.4}Stacking of Predictive Distributions}{17}{subsection.1.2.4}%
+\contentsline {subsection}{\numberline {1.2.5}Generalised Bayesian Inference}{18}{subsection.1.2.5}%
+\contentsline {subsection}{\numberline {1.2.6}Robust Divergence-Based Variational Inference}{18}{subsection.1.2.6}%
+\contentsline {section}{\numberline {1.3}Problem Statement}{19}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Research Objectives}{20}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Report Structure}{20}{section.1.5}%
+\contentsline {chapter}{\numberline {2}Literature Review and Theory}{22}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Bayesian Inference}{22}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Probability Notation and Conventions}{22}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}The Posterior and Bayes' Rule}{23}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Posterior Intractability}{23}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Variational Inference}{24}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}The Variational Objective}{24}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}The Evidence Lower Bound}{25}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Mean Field Variational Inference}{26}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Limitations of Standard Variational Families}{27}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}Imprecise Probabilities and Credal Sets}{27}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Motivation: When Precise Priors Are Unjustified}{28}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Lower and Upper Previsions}{28}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Credal Sets: Formal Definition and Properties}{29}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}The KL Convexity Guarantee}{30}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Convexity of KL Divergence}{30}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}The Mixture Lower Bound}{30}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Implications for Credal Mixture Inference}{31}{subsection.2.4.3}%
+\contentsline {section}{\numberline {2.5}Normalising Flows}{32}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Change of Variables and the Flow Framework}{32}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Continuous Normalising Flows and Neural ODEs}{33}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}The Log-Determinant Bottleneck}{34}{subsection.2.5.3}%
+\contentsline {section}{\numberline {2.6}Flow Matching}{34}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Probability Paths and Vector Fields}{35}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}The Conditional Flow Matching Objective}{35}{subsection.2.6.2}%
+\contentsline {subsection}{\numberline {2.6.3}Simulation-Free Training}{36}{subsection.2.6.3}%
+\contentsline {subsection}{\numberline {2.6.4}Conditioning on Auxiliary Information}{37}{subsection.2.6.4}%
+\contentsline {section}{\numberline {2.7}The KL Convexity Guarantee Under Flow Approximation}{38}{section.2.7}%
+\contentsline {subsection}{\numberline {2.7.1}From Exact to Approximate Posteriors}{38}{subsection.2.7.1}%
+\contentsline {subsection}{\numberline {2.7.2}The Approximate Mixture Bound}{39}{subsection.2.7.2}%
+\contentsline {chapter}{\numberline {3}Methodology}{41}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Research Design and Hypotheses}{41}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Research Hypotheses}{41}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Experimental Design}{42}{subsection.3.1.2}%
+\contentsline {section}{\numberline {3.2}Datasets and Problem Formulations}{43}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}German Credit (Bayesian Logistic Regression)}{43}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Minnesota Radon}{44}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Old Faithful}{44}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Synthetic Two-Dimensional Datasets}{45}{subsection.3.2.4}%
+\contentsline {paragraph}{Eight-Ring.}{45}{section*.8}%
+\contentsline {paragraph}{Two-Arm Spirals.}{45}{section*.9}%
+\contentsline {paragraph}{Two Moons.}{45}{section*.10}%
+\contentsline {subsection}{\numberline {3.2.5}Credal Sets}{45}{subsection.3.2.5}%
+\contentsline {section}{\numberline {3.3}Model Architecture}{46}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Input Processing}{47}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Time Embedding}{48}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Prior Embedding and Conditioning Vector}{49}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}FiLM-Conditioned Residual Blocks}{49}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}Output Head and Velocity Prediction}{50}{subsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.6}Dataset-Specific Configurations}{51}{subsection.3.3.6}%
+\contentsline {section}{\numberline {3.4}Training Procedure}{51}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Phase 1: Posterior Sample Generation via HMC}{52}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Phase 2: Conditional Flow Matching Training}{53}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Training Details and Convergence}{55}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}Credal Weight Optimisation}{56}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}The Shared Objective}{56}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Optimisation Algorithms}{57}{subsection.3.5.2}%
+\contentsline {paragraph}{Baseline methods.}{57}{section*.11}%
+\contentsline {paragraph}{EM algorithm.}{57}{section*.12}%
+\contentsline {paragraph}{Gradient-based methods.}{59}{section*.13}%
+\contentsline {paragraph}{Frank-Wolfe.}{59}{section*.14}%
+\contentsline {paragraph}{Coordinate pair search.}{60}{section*.15}%
+\contentsline {paragraph}{Grid search.}{60}{section*.16}%
+\contentsline {subsection}{\numberline {3.5.3}Algorithm Summary}{60}{subsection.3.5.3}%
+\contentsline {chapter}{\numberline {4}Results and Discussion}{62}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Primary Result: German Credit Low-Data Regime}{62}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Mean NLL and Regret}{62}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}H1: Guarantee Visibility}{63}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}H3: Algorithm Comparison}{64}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}MCMC Reference Baseline}{65}{subsection.4.1.4}%
+\contentsline {section}{\numberline {4.2}Null Control: German Credit Full-Data Regime}{65}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Supplementary Null Control: Minnesota Radon}{66}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Architectural Ablation: Shared vs Separate Models}{67}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Supplementary Analyses}{68}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Prior Sensitivity}{68}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Weight Stability}{68}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Leave-One-Prior-Out}{69}{subsection.4.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Calibration}{70}{subsection.4.5.4}%
+\contentsline {subsection}{\numberline {4.5.5}Optimiser Convergence}{71}{subsection.4.5.5}%
+\contentsline {subsection}{\numberline {4.5.6}Flow Matching vs CNF Training Speed}{72}{subsection.4.5.6}%
+\contentsline {section}{\numberline {4.6}Synthetic 2D Datasets}{73}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Hypothesis Outcomes}{74}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Conclusion}{76}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Summary of Contributions}{76}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Limitations}{77}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Future Work}{77}{section.5.3}%

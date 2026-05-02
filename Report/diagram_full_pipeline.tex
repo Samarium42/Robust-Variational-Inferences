@@ -1,0 +1,94 @@
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  every node/.style = {font=\small},
+  mainbox/.style = {rectangle, rounded corners=5pt,
+                    draw=#1!80!black, fill=#1!15,
+                    text width=3.2cm, minimum height=3.0cm,
+                    align=center},
+  iobox/.style   = {rectangle, rounded corners=5pt,
+                    draw=orange!80!black, fill=orange!10,
+                    text width=2.4cm, minimum height=3.0cm,
+                    align=center},
+  arr/.style     = {-{Stealth[length=5pt]}, thick, gray!60!black},
+  scale=0.85, transform shape,
+]
+
+%% ══ ROW 1: left to right ═════════════════════════════════════════════════
+\node[iobox] at (0, 0) (input) {
+  $\mathcal{D}$\\[3pt]
+  $\Pi=\{\pi_1,\ldots,\pi_K\}$\\[3pt]
+  observations\\$+$\\credal set
+};
+
+\node[mainbox=cyan] at (4.0, 0) (hmc) {
+  {\color{cyan!80!black}\footnotesize\bfseries Phase 1}\\[3pt]
+  \textbf{HMC} $\times K$\\[4pt]
+  $L=15,\ \varepsilon=0.005$\\[2pt]
+  1k warmup\\3k samples\\[4pt]
+  \textit{cached to disk}
+};
+
+\node[mainbox=teal] at (8.0, 0) (cfm) {
+  {\color{teal!80!black}\footnotesize\bfseries Phase 2}\\[3pt]
+  \textbf{CFM Training}\\
+  $v_\theta(z,t,k)$\\[4pt]
+  6{,}000 steps\\Huber loss\\FiLM blocks\\[4pt]
+  \textit{shared backbone}
+};
+
+\draw[arr] (input) -- (hmc);
+\draw[arr] (hmc)   -- (cfm);
+
+%% ══ ROW 2: right to left (U-turn flow) ══════════════════════════════════
+\node[mainbox=violet] at (8.0, -5.5) (infer) {
+  {\color{violet!80!black}\footnotesize\bfseries Inference}\\[3pt]
+  \textbf{ODE} $\times K$\\
+  Dormand-Prince\\[4pt]
+  $z(0)\sim\pi_k$\\
+  $\downarrow$\\
+  $z(1)\sim q_k^\theta$\\[4pt]
+  \textit{posterior samples}
+};
+
+\node[mainbox=orange] at (4.0, -5.5) (wopt) {
+  {\color{orange!80!black}\footnotesize\bfseries Phase 3}\\[3pt]
+  \textbf{EM on} $\Delta_{K-1}$\\[4pt]
+  val NLL\\objective\\200 iters\\[4pt]
+  \textit{closed-form}
+};
+
+\node[iobox] at (0, -5.5) (output) {
+  $q_{\hat{w}}(\theta)$\\[4pt]
+  $=\!\sum_k\hat{w}_k q_k^\theta$\\[4pt]
+  \textbf{Credal}\\\textbf{Mixture}
+};
+
+\draw[arr] (infer) -- (wopt);
+\draw[arr] (wopt)  -- (output);
+
+%% ── Vertical connector: CFM straight down to Inference ───────────────────
+\draw[arr] (cfm.south) -- (infer.north);
+
+%% ══ GUARANTEE BANNER ════════════════════════════════════════════════════
+\node[rectangle, rounded corners=4pt,
+      draw=blue!60!black, fill=blue!8,
+      text width=11.0cm, align=center, font=\small,
+      minimum height=1.1cm]
+  at (4.0, -8.5) {
+  \textbf{KL Convexity Guarantee (Theorem 2.7):}\\[3pt]
+  $\mathrm{KL}(P \,\|\, m^\theta_{\hat{w}^N})
+  \;\leq\;
+  \min_k\,\mathrm{KL}(P \,\|\, m_k)
+  \;+\;\eta\;+\;\delta_N$,
+  \quad $\delta_N \xrightarrow{\mathrm{a.s.}} 0$
+};
+
+\end{tikzpicture}
+\caption{Full pipeline for robust credal variational inference.
+         Phase 1 generates and caches HMC posterior samples per prior.
+         Phase 2 trains a shared conditional flow matching model.
+         At inference, $K$ ODE integrations produce approximate posteriors.
+         Phase 3 selects optimal mixture weights via EM on the simplex.}
+\label{fig:diagram_pipeline}
+\end{figure}

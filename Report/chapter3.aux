@@ -1,0 +1,136 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Methodology}{41}{chapter.3}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\newlabel{chap:methodology}{{3}{41}{Methodology}{chapter.3}{}}
+\newlabel{chap:methodology@cref}{{[chapter][3][]3}{[1][41][]41}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Research Design and Hypotheses}{41}{section.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Research Hypotheses}{41}{subsection.3.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Experimental Design}{42}{subsection.3.1.2}\protected@file@percent }
+\citation{hofmann1994}
+\citation{gelman2007}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Datasets and Problem Formulations}{43}{section.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}German Credit (Bayesian Logistic Regression)}{43}{subsection.3.2.1}\protected@file@percent }
+\citation{azzalini1990}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Minnesota Radon}{44}{subsection.3.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Old Faithful}{44}{subsection.3.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Synthetic Two-Dimensional Datasets}{45}{subsection.3.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Eight-Ring.}{45}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Two-Arm Spirals.}{45}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Two Moons.}{45}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.5}Credal Sets}{45}{subsection.3.2.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Credal sets used for each experimental setting. All Gaussian priors are isotropic. $\sigma $ denotes the standard deviation, $\nu $ the degrees of freedom for Student-T, and $b$ the scale for Laplace.}}{46}{table.3.1}\protected@file@percent }
+\newlabel{tab:priors}{{3.1}{46}{Credal sets used for each experimental setting. All Gaussian priors are isotropic. $\sigma $ denotes the standard deviation, $\nu $ the degrees of freedom for Student-T, and $b$ the scale for Laplace}{table.3.1}{}}
+\newlabel{tab:priors@cref}{{[table][1][3]3.1}{[1][45][]46}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Model Architecture}{46}{section.3.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Common architecture and optimiser settings across all experiments.}}{47}{table.3.2}\protected@file@percent }
+\newlabel{tab:common_arch}{{3.2}{47}{Common architecture and optimiser settings across all experiments}{table.3.2}{}}
+\newlabel{tab:common_arch@cref}{{[table][2][3]3.2}{[1][46][]47}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Input Processing}{47}{subsection.3.3.1}\protected@file@percent }
+\citation{vaswani2017}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Full pipeline for robust credal variational inference. Phase 1 generates and caches HMC posterior samples per prior. Phase 2 trains a shared conditional flow matching model. At inference, $K$ ODE integrations produce approximate posteriors. Phase 3 selects optimal mixture weights via EM on the simplex.}}{48}{figure.3.1}\protected@file@percent }
+\newlabel{fig:diagram_pipeline}{{3.1}{48}{Full pipeline for robust credal variational inference. Phase 1 generates and caches HMC posterior samples per prior. Phase 2 trains a shared conditional flow matching model. At inference, $K$ ODE integrations produce approximate posteriors. Phase 3 selects optimal mixture weights via EM on the simplex}{figure.3.1}{}}
+\newlabel{fig:diagram_pipeline@cref}{{[figure][1][3]3.1}{[1][47][]48}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Time Embedding}{48}{subsection.3.3.2}\protected@file@percent }
+\citation{perez2018}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.3}Prior Embedding and Conditioning Vector}{49}{subsection.3.3.3}\protected@file@percent }
+\newlabel{eq:cond_vec}{{3.6}{49}{Prior Embedding and Conditioning Vector}{equation.3.6}{}}
+\newlabel{eq:cond_vec@cref}{{[equation][6][3]3.6}{[1][49][]49}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.4}FiLM-Conditioned Residual Blocks}{49}{subsection.3.3.4}\protected@file@percent }
+\citation{ba2016}
+\newlabel{eq:film_block}{{3.8}{50}{FiLM-Conditioned Residual Blocks}{equation.3.8}{}}
+\newlabel{eq:film_block@cref}{{[equation][8][3]3.8}{[1][50][]50}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces FiLM block configuration.}}{50}{table.3.3}\protected@file@percent }
+\newlabel{tab:film_block}{{3.3}{50}{FiLM block configuration}{table.3.3}{}}
+\newlabel{tab:film_block@cref}{{[table][3][3]3.3}{[1][50][]50}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.5}Output Head and Velocity Prediction}{50}{subsection.3.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.6}Dataset-Specific Configurations}{51}{subsection.3.3.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.4}{\ignorespaces Dataset-specific configurations. All other parameters follow Table~\ref {tab:common_arch}.}}{51}{table.3.4}\protected@file@percent }
+\newlabel{tab:dataset_arch}{{3.4}{51}{Dataset-specific configurations. All other parameters follow Table~\ref {tab:common_arch}}{table.3.4}{}}
+\newlabel{tab:dataset_arch@cref}{{[table][4][3]3.4}{[1][51][]51}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Training Procedure}{51}{section.3.4}\protected@file@percent }
+\citation{neal2011}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.1}Phase 1: Posterior Sample Generation via HMC}{52}{subsection.3.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.5}{\ignorespaces HMC configuration for posterior sample generation. The same settings are used for all priors and datasets.}}{52}{table.3.5}\protected@file@percent }
+\newlabel{tab:hmc_config}{{3.5}{52}{HMC configuration for posterior sample generation. The same settings are used for all priors and datasets}{table.3.5}{}}
+\newlabel{tab:hmc_config@cref}{{[table][5][3]3.5}{[1][52][]52}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Phase 1: HMC posterior sampling. For each prior $\pi _k \in \Pi $, 3{,}000 posterior samples are generated after a 1{,}000-step warmup and cached to disk for reuse across all training runs.}}{53}{figure.3.2}\protected@file@percent }
+\newlabel{fig:diagram_hmc}{{3.2}{53}{Phase 1: HMC posterior sampling. For each prior $\pi _k \in \Pi $, 3{,}000 posterior samples are generated after a 1{,}000-step warmup and cached to disk for reuse across all training runs}{figure.3.2}{}}
+\newlabel{fig:diagram_hmc@cref}{{[figure][2][3]3.2}{[1][52][]53}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.2}Phase 2: Conditional Flow Matching Training}{53}{subsection.3.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Phase 2: Conditional Flow Matching training. A single shared \texttt  {VelocityResNet} is trained jointly across all $K$ priors using the simulation-free CFM objective.}}{54}{figure.3.3}\protected@file@percent }
+\newlabel{fig:diagram_cfm}{{3.3}{54}{Phase 2: Conditional Flow Matching training. A single shared \texttt {VelocityResNet} is trained jointly across all $K$ priors using the simulation-free CFM objective}{figure.3.3}{}}
+\newlabel{fig:diagram_cfm@cref}{{[figure][3][3]3.3}{[1][53][]54}{}{}{}}
+\newlabel{eq:huber_loss}{{3.11}{54}{Phase 2: Conditional Flow Matching Training}{equation.3.11}{}}
+\newlabel{eq:huber_loss@cref}{{[equation][11][3]3.11}{[1][54][]54}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4.3}Training Details and Convergence}{55}{subsection.3.4.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.6}{\ignorespaces Training configuration for the conditional flow matching model.}}{55}{table.3.6}\protected@file@percent }
+\newlabel{tab:train_config}{{3.6}{55}{Training configuration for the conditional flow matching model}{table.3.6}{}}
+\newlabel{tab:train_config@cref}{{[table][6][3]3.6}{[1][55][]55}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Credal Weight Optimisation}{56}{section.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}The Shared Objective}{56}{subsection.3.5.1}\protected@file@percent }
+\newlabel{eq:weight_obj}{{3.12}{56}{The Shared Objective}{equation.3.12}{}}
+\newlabel{eq:weight_obj@cref}{{[equation][12][3]3.12}{[1][56][]56}{}{}{}}
+\newlabel{eq:logpk}{{3.13}{56}{The Shared Objective}{equation.3.13}{}}
+\newlabel{eq:logpk@cref}{{[equation][13][3]3.13}{[1][56][]56}{}{}{}}
+\newlabel{eq:nll_logsumexp}{{3.14}{56}{The Shared Objective}{equation.3.14}{}}
+\newlabel{eq:nll_logsumexp@cref}{{[equation][14][3]3.14}{[1][56][]56}{}{}{}}
+\newlabel{eq:nll_gradient}{{3.15}{56}{The Shared Objective}{equation.3.15}{}}
+\newlabel{eq:nll_gradient@cref}{{[equation][15][3]3.15}{[1][56][]56}{}{}{}}
+\newlabel{eq:responsibilities}{{3.16}{56}{The Shared Objective}{equation.3.16}{}}
+\newlabel{eq:responsibilities@cref}{{[equation][16][3]3.16}{[1][56][]56}{}{}{}}
+\citation{dempster1977}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Optimisation Algorithms}{57}{subsection.3.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Baseline methods.}{57}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{EM algorithm.}{57}{section*.12}\protected@file@percent }
+\newlabel{eq:em_estep}{{3.18}{57}{EM algorithm}{equation.3.18}{}}
+\newlabel{eq:em_estep@cref}{{[equation][18][3]3.18}{[1][57][]57}{}{}{}}
+\newlabel{eq:em_mstep}{{3.19}{57}{EM algorithm}{equation.3.19}{}}
+\newlabel{eq:em_mstep@cref}{{[equation][19][3]3.19}{[1][57][]57}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Phase 3: EM weight optimisation on $\Delta _{K-1}$. The E-step and M-step alternate until convergence, producing optimal mixture weights $\hat  {w}$ that minimise the held-out negative log-likelihood.}}{58}{figure.3.4}\protected@file@percent }
+\newlabel{fig:diagram_em}{{3.4}{58}{Phase 3: EM weight optimisation on $\Delta _{K-1}$. The E-step and M-step alternate until convergence, producing optimal mixture weights $\hat {w}$ that minimise the held-out negative log-likelihood}{figure.3.4}{}}
+\newlabel{fig:diagram_em@cref}{{[figure][4][3]3.4}{[1][57][]58}{}{}{}}
+\citation{duchi2008}
+\citation{duchi2008}
+\citation{beck2003}
+\citation{frank1956}
+\@writefile{toc}{\contentsline {paragraph}{Gradient-based methods.}{59}{section*.13}\protected@file@percent }
+\newlabel{eq:mirror_descent}{{3.22}{59}{Gradient-based methods}{equation.3.22}{}}
+\newlabel{eq:mirror_descent@cref}{{[equation][22][3]3.22}{[1][59][]59}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Frank-Wolfe.}{59}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Coordinate pair search.}{60}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Grid search.}{60}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}Algorithm Summary}{60}{subsection.3.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.7}{\ignorespaces Credal weight optimisation algorithms. All algorithms optimise the same held-out NLL objective over $\Delta _{K-1}$.}}{60}{table.3.7}\protected@file@percent }
+\newlabel{tab:weight_algorithms}{{3.7}{60}{Credal weight optimisation algorithms. All algorithms optimise the same held-out NLL objective over $\Delta _{K-1}$}{table.3.7}{}}
+\newlabel{tab:weight_algorithms@cref}{{[table][7][3]3.7}{[1][60][]60}{}{}{}}
+\@setckpt{chapter3}{
+\setcounter{page}{62}
+\setcounter{equation}{25}
+\setcounter{enumi}{7}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{0}
+\setcounter{mpfootnote}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{3}
+\setcounter{section}{5}
+\setcounter{subsection}{3}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{figure}{4}
+\setcounter{table}{7}
+\setcounter{NAT@ctr}{0}
+\setcounter{lstnumber}{1}
+\setcounter{parentequation}{0}
+\setcounter{section@level}{2}
+\setcounter{Item}{11}
+\setcounter{Hfootnote}{0}
+\setcounter{bookmark@seq@number}{0}
+\setcounter{theorem}{0}
+\setcounter{assumption}{0}
+\setcounter{lstlisting}{0}
+}

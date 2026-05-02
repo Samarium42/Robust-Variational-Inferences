@@ -1,11 +1,40 @@
 \documentclass[12pt,MSc,wordcount,twoside,anon]{muthesis}
+\usepackage[T1]{fontenc}
+\usepackage[authoryear]{natbib}
+\bibliographystyle{apalike} 
 
 \usepackage{verbatim}
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=2pt, topsep=4pt, parsep=0pt, partopsep=0pt}
 \usepackage{graphicx}
-\usepackage{url} % typeset URL's reasonably
+\usepackage{url}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{pslatex}
+\usepackage[pdfusetitle=false, bookmarks=false]{hyperref}
+\usepackage{cleveref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, shapes, positioning, fit, backgrounds}
+\graphicspath{{./figures/}{../notebooks/}}
 
-\usepackage{pslatex} % Use Postscript fonts
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}{Assumption}[chapter]
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 
 \setcounter{secnumdepth}{3}
 
@@ -23,15 +52,77 @@ via Imprecise Probabilities}
 
 \prefacesection{Abstract}
 
-\input{abstract}
+\abstracttitle
+{\singlespacing
+Bayesian inference requires the specification of a prior 
+distribution, yet in practice multiple priors are often 
+equally defensible and the resulting posteriors can differ 
+substantially under limited data. This thesis develops a 
+principled framework for robust Bayesian inference under 
+prior uncertainty, grounded in the theory of imprecise 
+probabilities and realised computationally through flow 
+matching. The central theoretical contribution is a 
+guarantee that a credal mixture over $K$ flow-based 
+posterior approximations achieves predictive performance 
+no worse than the best single-prior component: the 
+convexity of KL divergence ensures that combination over 
+a credal set can only improve over selection. An 
+approximate version of this guarantee is established for 
+the practical setting where posteriors are learned by a 
+shared-backbone conditional flow matching model and 
+mixture weights are selected by held-out negative 
+log-likelihood optimisation on the probability simplex.
+
+The framework is evaluated through a systematic 
+experimental programme spanning two real-world Bayesian 
+classification datasets, a regression dataset, and three 
+synthetic settings, with eight weight optimisation 
+algorithms compared across multiple random seeds. Three 
+pre-registered hypotheses are confirmed: the convexity 
+guarantee is empirically visible in the prior-sensitive 
+low-data regime, disappears correctly when data is 
+sufficient to overwhelm prior influence, and the EM 
+algorithm achieves the lowest worst-case regret among 
+all algorithms tested. The credal mixture achieves 
+near-oracle robustness with a factor of eight 
+improvement in worst-case regret over the best 
+val-selected single-prior strategy. A shared-backbone 
+architecture is shown to outperform independently 
+trained flows on predictive performance, training 
+stability, and parameter efficiency, providing empirical 
+validation for the uniform transfer assumption 
+underpinning the theoretical guarantee.
+}
 
 \afterabstract
 
 \prefacesection{Acknowledgements}
-I would like to thank...
+I would like to express my sincere gratitude to my 
+supervisor, Dr.\ Michele Caprio, for his invaluable 
+guidance, generosity with his time, and for 
+contributing two important theoretical results 
+to this thesis. His insight and encouragement 
+throughout this project have been indispensable.
+
+I am deeply grateful to my family for their 
+unwavering support and for always believing in me, 
+and to my girlfriend for her patience, 
+understanding, and encouragement during the most 
+demanding stretches of this work.
+
+Finally, I would like to thank my cat Ash, whose 
+companionship during the long hours of research 
+and writing was a source of comfort that should 
+not go unacknowledged.
+
 \afterpreface
 
 % These include the actual text
 \include{chapter1}
+\include{chapter2}
+\include{chapter3}
+\include{chapter4}
+\include{chapter5}
 
+\bibliography{references}
 \end{document}

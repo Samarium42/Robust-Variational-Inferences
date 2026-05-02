@@ -1,0 +1,3 @@
+method,mean_step_ms,median_step_ms,total_time_s,nll_gaussian,nll_gaussian_wide,nll_cauchy,nll_laplace,nll_student_t
+flow_matching,11.669,9.958,106.7,0.658553,0.808665,0.695447,0.636953,0.704960
+cnf_baseline_estimated,139.650,137.580,1277.0,N/A (not trained),N/A (not trained),N/A (not trained),N/A (not trained),N/A (not trained)

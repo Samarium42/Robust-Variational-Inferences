@@ -1,0 +1,1311 @@
+\chapter{Methodology}
+\label{chap:methodology}
+
+\section{Research Design and Hypotheses}
+
+This chapter describes the experimental framework 
+used to investigate the central question of this 
+thesis: whether the KL convexity guarantee 
+established in Theorem~\ref{thm:exact_mixture_ch2} 
+is empirically visible when posteriors are 
+approximated by flow matching models and mixture 
+weights are selected by held-out negative log 
+likelihood. The theoretical guarantee is exact 
+and holds under the conditions of 
+Theorem~\ref{thm:approx_mixture_ch2}, but whether 
+those conditions are satisfied in practice, and 
+whether the resulting improvement over the best 
+single component is large enough to be practically 
+meaningful, are empirical questions that the 
+theory cannot answer.
+
+\subsection{Research Hypotheses}
+
+The experiments are organised around three 
+hypotheses, each corresponding to a different 
+aspect of the theoretical framework.
+
+\textbf{H1 (Guarantee Visibility).} In the 
+prior-sensitive regime, the credal mixture 
+selected by held-out NLL will achieve lower 
+test NLL than the best single-prior component 
+selected by the same held-out criterion. This 
+is the empirical counterpart of 
+Theorem~\ref{thm:approx_mixture_ch2}: if the 
+approximation error $\eta$ and the estimation 
+error $\delta_N$ are both small, the mixture 
+should dominate or match the best single 
+component.
+
+\textbf{H2 (Prior Sensitivity Requirement).} 
+In the prior-insensitive regime, the mean 
+test NLL of the credal mixture will be within 
+0.005 nats of the best single-prior component, 
+and the difference will not be statistically 
+significant at the 0.05 level under a paired 
+Wilcoxon signed-rank test across seeds. This 
+corresponds to the null regime identified in 
+Corollary~\ref{cor:recovery_ch2}: when all 
+posteriors have converged, the credal mixture 
+reduces to the best single component and 
+provides no additional benefit. Confirming 
+this null result is as important as confirming 
+H1, since it validates the theory rather than 
+merely the method.
+
+\textbf{H3 (Algorithm Comparison).} Among 
+the weight optimisation algorithms, the EM 
+algorithm will achieve the lowest worst-case 
+regret across seeds, defined as:
+\begin{equation}
+    \max_s \left(\mathrm{NLL}_{\mathrm{alg},s} 
+    - \mathrm{NLL}_{\mathrm{oracle},s}\right)
+\end{equation}
+where the oracle is the best prior on the 
+test set and $s$ indexes random seeds. 
+Worst-case regret is the primary criterion 
+because the theoretical guarantee is a 
+worst-case bound, and a weight selection 
+algorithm that performs well on average 
+but fails badly on some seeds does not 
+reliably realise the guarantee. This is 
+also the criterion most directly comparable 
+to the theoretical bound of 
+Theorem~\ref{thm:approx_mixture_ch2}.
+
+\subsection{Experimental Design}
+
+The hypotheses are tested using a two-regime 
+experimental design. A regime is considered 
+prior-sensitive if the predictive log-likelihood 
+gap between the best and worst prior exceeds 
+0.01 nats on the validation set, a threshold 
+chosen to reflect a practically meaningful 
+difference in predictive performance. Under 
+this definition, the low-data German Credit 
+setting ($n = 75$, 25 parameters) is 
+prior-sensitive: the gap between the best 
+prior (Gaussian or Laplace) and the worst 
+(GaussianWide) reaches 0.13 to 0.27 nats 
+across seeds, well above the threshold. The 
+full-data setting ($n = 700$) is 
+prior-insensitive by the same criterion, 
+with a maximum gap of 0.002 nats across all 
+priors and seeds.
+
+H1 and H2 are tested against the same 
+dataset under different data regimes, 
+ensuring that any difference in results 
+is attributable to prior sensitivity 
+rather than to differences in the 
+problem structure or model. H3 is tested 
+by comparing eight weight optimisation 
+algorithms on the same held-out data 
+under identical conditions. The datasets, 
+model architecture, training procedure, 
+weight optimisation algorithms, and 
+evaluation protocol are described in the 
+following sections.
+
+\section{Datasets and Problem Formulations}
+
+The experiments span three categories of 
+problem: a real-world Bayesian classification 
+task that serves as the primary evaluation 
+setting, a real-world regression task that 
+provides additional evidence under a different 
+likelihood structure, and synthetic two-dimensional 
+datasets used to visualise posterior geometry 
+and assess flow quality. Each category serves 
+a distinct role in the experimental narrative.
+
+\subsection{German Credit (Bayesian Logistic 
+Regression)}
+
+The primary dataset is the German Credit 
+dataset \citep{hofmann1994}, a binary classification 
+problem with 1000 observations and 24 input 
+features, available from the UCI Machine 
+Learning Repository. The task is to predict 
+credit risk (good or bad) from features 
+including loan amount, duration, credit 
+history, and employment status. We use the 
+dataset under a Bayesian logistic regression 
+model, which gives a 25-dimensional parameter 
+space (24 weights plus a bias term). The 
+likelihood is:
+\begin{equation}
+    \mathcal{L}(x \mid \theta) = 
+    \prod_{i=1}^n \sigma(y_i\, \theta^\top 
+    \tilde{x}_i)
+\end{equation}
+where $\sigma$ is the sigmoid function, 
+$y_i \in \{-1, +1\}$ are labels, and 
+$\tilde{x}_i$ are the feature vectors. 
+Features are standardised to zero mean 
+and unit variance before training.
+
+This dataset is used in two regimes that 
+directly correspond to the two-regime 
+experimental design of Section~3.1. In 
+the low-data regime, a random subsample 
+of $n = 75$ observations is drawn as the 
+training set, leaving the remaining 925 
+observations for validation and test. 
+With 25 parameters and only 75 observations, 
+the data-to-parameter ratio of 3:1 ensures 
+that the likelihood does not dominate the 
+prior, producing genuine prior sensitivity. 
+In the full-data regime, the full $n = 700$ 
+observations are used for training, with 
+the remaining 300 for validation and test. 
+At this data-to-parameter ratio of 28:1, 
+the likelihood dominates and all reasonable 
+priors produce essentially equivalent 
+posteriors. This regime serves as the null 
+control for H2.
+
+Experiments in the low-data regime are 
+repeated across 5 random seeds, where each 
+seed determines a different random subsample 
+of the training data. This allows us to 
+assess whether the identity of the best 
+prior is stable across data subsamples, 
+which is a prerequisite for the prior 
+sensitivity claim.
+
+\subsection{Minnesota Radon}
+
+The Minnesota Radon dataset \citep{gelman2007} contains radon measurements 
+from 919 houses across 85 counties in 
+Minnesota. We use the two-dimensional 
+formulation which models log radon 
+concentration as a function of floor 
+level (basement or first floor) using 
+a Bayesian linear regression model with 
+a two-dimensional parameter space 
+(intercept and slope). The likelihood is:
+\begin{equation}
+    \mathcal{L}(x \mid \theta) = 
+    \prod_{i=1}^n \mathcal{N}(y_i \mid 
+    \theta^\top \tilde{x}_i, \sigma^2)
+\end{equation}
+with $\sigma^2$ fixed. The dataset 
+contains approximately 620 training 
+observations after the train-test split, 
+giving a data-to-parameter ratio of 310:1. 
+This high ratio means the dataset falls 
+in the prior-insensitive regime by the 
+criterion of Section~3.1, and is used 
+as a supplementary null control alongside 
+the full-data German Credit setting. 
+Three priors are used: Gaussian, 
+GaussianNarrow, and Student-T. Experiments 
+are repeated across 10 random seeds.
+
+\subsection{Old Faithful}
+
+The Old Faithful dataset contains 272 
+observations of eruption duration and 
+waiting time between eruptions for the 
+Old Faithful geyser in Yellowstone 
+National Park \citep{azzalini1990}. 
+We use the two-dimensional formulation 
+with eruption duration and waiting time 
+as the two variables, modelled under a 
+Bayesian Gaussian mixture framework. 
+The dataset is well known for its 
+bimodal structure, with two clearly 
+separated clusters corresponding to 
+short and long eruption cycles, making 
+it a useful diagnostic for whether the 
+flow can represent multimodal posteriors 
+on real data.
+
+With only 218 training observations after 
+the train-test split and a two-dimensional 
+parameter space, the data-to-parameter 
+ratio is moderate. However, the strong 
+bimodal structure of the data means the 
+likelihood is highly informative about 
+the cluster locations, and prior 
+sensitivity is expected to be low. This 
+dataset therefore serves as an additional 
+supplementary experiment rather than a 
+primary evaluation setting. Note that 
+the critic-based weight optimisation 
+used in initial experiments on this 
+dataset produced NaN weights, confirming 
+the instability of the adversarial 
+approach identified in Section~3.5 
+and motivating the switch to direct 
+NLL-based weight optimisation.
+
+\subsection{Synthetic Two-Dimensional Datasets}
+
+Three synthetic two-dimensional datasets 
+are used to visualise posterior geometry, 
+assess the quality of the flow-based 
+approximations, and evaluate the credal 
+mixture on problems with known ground 
+truth density structure.
+
+\paragraph{Eight-Ring.} A mixture of eight 
+Gaussian distributions arranged in a ring 
+pattern in $\mathbb{R}^2$. This dataset 
+tests whether the flow model can represent 
+multimodal posteriors with strong rotational 
+structure. The eight modes are evenly spaced 
+on a circle of radius 3, each with standard 
+deviation 0.3.
+
+\paragraph{Two-Arm Spirals.} Two interleaved 
+spiral arms in $\mathbb{R}^2$, generating a 
+highly non-convex density with long-range 
+correlations between dimensions. This tests 
+whether the flow can capture complex 
+topological structure that mean field 
+approximations cannot represent.
+
+\paragraph{Two Moons.} Two crescent-shaped 
+clusters offset from each other in 
+$\mathbb{R}^2$, a standard benchmark for 
+approximate inference methods. The 
+non-linear decision boundary and 
+bimodal structure make it a useful 
+diagnostic for posterior approximation 
+quality.
+
+For the synthetic datasets, the target 
+distribution is the dataset density 
+itself rather than a Bayesian posterior 
+the flow is trained to approximate 
+the data generating distribution under 
+five different priors acting as additive 
+perturbations. Five priors are used: 
+Gaussian, GaussianNarrow, Laplace, 
+Student-T, and RingMixture. Experiments 
+are repeated across 10 random seeds. 
+Evaluation uses kernel density estimation 
+negative log likelihood (KDE-NLL) rather 
+than predictive log likelihood, since 
+there is no likelihood function in the 
+Bayesian sense. These results are 
+supplementary and serve primarily to 
+visualise the flow approximations and 
+the credal mixture geometry.
+
+\subsection{Credal Sets}
+
+The credal set for each problem is 
+constructed by specifying $K$ prior 
+distributions over the model parameters 
+$\theta$. Table~\ref{tab:priors} 
+summarises the priors used for each 
+dataset.
+
+\begin{table}[h]
+\centering
+\caption{Credal sets used for each 
+experimental setting. All Gaussian 
+priors are isotropic. $\sigma$ denotes 
+the standard deviation, $\nu$ the 
+degrees of freedom for Student-T, and 
+$b$ the scale for Laplace.}
+\label{tab:priors}
+{\singlespacing
+\begin{tabular}{llll}
+\hline
+Dataset & Prior & Parameters & Notes \\
+\hline
+German Credit & Gaussian & $\sigma = 1.0$ & Standard \\
+ & Laplace & $b = 1.0$ & Heavy-tailed \\
+ & Cauchy & $\gamma = 1.0$ & Very heavy \\
+ & Student-T & $\nu = 3$ & Moderate tails \\
+ & GaussianWide & $\sigma = 5.0$ & Weakly informative \\
+\hline
+Radon MN & Gaussian & $\sigma = 1.0$ & Standard \\
+ & GaussianNarrow & $\sigma = 0.3$ & Informative \\
+ & Student-T & $\nu = 3$ & Moderate tails \\
+\hline
+Old Faithful & Gaussian & $\sigma = 1.0$ & Standard \\
+ & GaussianNarrow & $\sigma = 0.3$ & Informative \\
+ & Student-T & $\nu = 3$ & Moderate tails \\
+\hline
+Synthetic & Gaussian & $\sigma = 1.0$ & Standard \\
+ & GaussianNarrow & $\sigma = 0.5$ & Informative \\
+ & Laplace & $b = 1.0$ & Heavy-tailed \\
+ & Student-T & $\nu = 3$ & Moderate tails \\
+ & RingMixture & -- & Multimodal \\
+\hline
+\end{tabular}}
+\end{table}
+
+The priors in each credal set are chosen 
+to represent the range of beliefs a 
+practitioner might reasonably hold before 
+observing data. They vary along two axes: 
+tail behaviour (from light-tailed Gaussian 
+to heavy-tailed Cauchy) and scale (from 
+the informative GaussianNarrow to the 
+weakly informative GaussianWide). No 
+single prior is known to be correct 
+a priori, which is precisely the 
+motivation for the credal mixture 
+approach.
+
+\section{Model Architecture}
+
+All experiments use a single shared 
+conditional velocity field, implemented 
+as a neural network called 
+\texttt{VelocityResNet}. The key design 
+principle is that one model serves all 
+$K$ priors simultaneously: rather than 
+training $K$ separate networks, a single 
+network learns to approximate the 
+posterior under each prior by conditioning 
+on a discrete prior index. This shared 
+backbone is what makes the credal mixture 
+computationally tractable and ensures 
+the uniform approximation quality required 
+by Assumption~\ref{ass:transfer_ch2}.
+
+At a high level, the network takes three 
+inputs at each training step: the current 
+position $z \in \mathbb{R}^D$ in parameter 
+space, the current time $t \in [0,1]$ 
+along the flow trajectory, and the prior 
+index $k \in \{1, \ldots, K\}$ identifying 
+which prior is active. It outputs a 
+velocity vector $v_\theta(z, t, k) \in 
+\mathbb{R}^D$ that tells a particle at 
+position $z$ at time $t$ which direction 
+to move in order to travel from the base 
+distribution toward the posterior under 
+prior $\pi_k$. The network architecture 
+is summarised in Table~\ref{tab:common_arch}.
+
+\begin{table}[h]
+\centering
+\caption{Common architecture and 
+optimiser settings across all 
+experiments.}
+\label{tab:common_arch}
+{\singlespacing
+\begin{tabular}{lll}
+\hline
+Parameter & Value & Role \\
+\hline
+\multicolumn{3}{l}{\textit{Architecture}} \\
+Model & VelocityResNet 
+& Velocity field backbone \\
+Hidden dimension & 256 
+& Width of each layer \\
+Depth & 6 FiLM blocks 
+& Number of processing stages \\
+Time embedding dim & 64 
+& Encoding of $t$ \\
+Prior embedding dim & 16 
+& Encoding of prior index $k$ \\
+Dropout & 0.05 
+& Regularisation \\
+Activation & SiLU 
+& Non-linearity \\
+\hline
+\multicolumn{3}{l}{\textit{Flow Matching}} \\
+Path & Linear interpolant 
+& Straight-line trajectories \\
+Base distribution & Prior $\pi_k$ (Bayesian); $\mathcal{N}(0,I)$ (synthetic) 
+& Starting distribution \\
+Time sampling & $\mathcal{U}[0,1]$ 
+& Uniform over trajectory \\
+ODE solver (inference) & Dormand-Prince 
+& Adaptive step integration \\
+\hline
+\multicolumn{3}{l}{\textit{Optimiser}} \\
+Optimiser & Adam 
+& Gradient-based training \\
+Learning rate & $1 \times 10^{-3}$ 
+& Step size \\
+Weight decay & $1 \times 10^{-5}$ 
+& L2 regularisation \\
+Batch size & 512 
+& Samples per update \\
+\hline
+\end{tabular}}
+\end{table}
+
+Figure~\ref{fig:diagram_pipeline} provides 
+an overview of the full training pipeline 
+before each component is described in detail.
+
+\input{diagram_full_pipeline}
+
+\subsection{Input Processing}
+
+The network receives three inputs that 
+must be encoded into a form suitable for 
+a neural network before any processing 
+can begin.
+
+The position $z \in \mathbb{R}^D$ 
+represents the current location of a 
+particle in the parameter space $\Theta$. 
+At $t = 0$ it is drawn from the source 
+distribution, which is the prior $\pi_k$ 
+for Bayesian experiments and 
+$\mathcal{N}(0, I)$ for synthetic 
+experiments, and by $t = 1$ it should 
+have been transported to the approximate 
+posterior. The position is projected into 
+the hidden dimension by a two-layer MLP 
+with SiLU activations:
+\begin{equation}
+    h_0 = W_2\,\sigma(W_1 z + b_1) + b_2 
+    \in \mathbb{R}^{256}
+\end{equation}
+where $\sigma$ denotes the SiLU activation 
+function $\sigma(x) = x \cdot \text{sigmoid}(x)$, 
+which is smooth and avoids the dying 
+neuron problem of ReLU. This initial 
+projection $h_0$ is the starting hidden 
+state that is then refined by the 
+sequence of FiLM blocks.
+
+The time $t \in [0,1]$ and the prior 
+index $k$ are encoded separately and 
+then combined into a single conditioning 
+vector, described in the following 
+subsections.
+
+\subsection{Time Embedding}
+
+The time $t \in [0,1]$ needs to be 
+encoded in a way that allows the network 
+to distinguish fine-grained differences 
+in position along the trajectory, 
+particularly near $t = 0$ and $t = 1$ 
+where the distribution changes most 
+rapidly. A single scalar $t$ is too 
+limited for this: a neural network 
+struggles to represent high-frequency 
+variation from a raw scalar input.
+
+The solution is a sinusoidal embedding 
+that maps $t$ to a vector of sine and 
+cosine values at different frequencies, 
+similar to the positional encoding used 
+in transformer models \citep{vaswani2017}. For $n_f = 12$ frequency bands 
+$\mathbf{f} = [2^0, 2^1, \ldots, 
+2^{n_f - 1}]$:
+\begin{equation}
+    \psi(t) = \mathrm{MLP}\Bigl(
+    \bigl[t,\; 
+    \sin(2\pi\, t \cdot \mathbf{f}),\; 
+    \cos(2\pi\, t \cdot \mathbf{f})
+    \bigr]\Bigr) \in \mathbb{R}^{64}
+\end{equation}
+where $[\cdot]$ denotes concatenation 
+and the MLP has two hidden layers with 
+SiLU activations. The sine and cosine 
+terms at different frequencies act as 
+a bank of clocks running at different 
+speeds: low frequencies capture the 
+coarse position along the trajectory 
+while high frequencies capture fine 
+detail. The MLP then compresses this 
+$1 + 2n_f = 25$ dimensional input into 
+a 64-dimensional time embedding.
+
+\subsection{Prior Embedding and 
+Conditioning Vector}
+
+The prior index $k \in \{1, \ldots, K\}$ 
+is a discrete label identifying which 
+prior is active. Neural networks cannot 
+process discrete labels directly, so the 
+index is mapped to a continuous vector 
+via a learned embedding table. This is 
+implemented as \texttt{nn.Embedding}, 
+which maintains a lookup table of $K$ 
+vectors $\{e_1, \ldots, e_K\} \subset 
+\mathbb{R}^{16}$, one per prior. The 
+embedding for prior $k$ is simply 
+$e_k$, which is learned jointly with 
+all other network parameters during 
+training.
+
+The intuition is that the embedding 
+learns to place priors that produce 
+similar posteriors close together in 
+the 16-dimensional embedding space, 
+and priors that produce very different 
+posteriors far apart. This gives the 
+network a geometric representation of 
+the relationships between priors that 
+it can use to modulate its behaviour 
+appropriately.
+
+The time embedding and prior embedding 
+are concatenated to form the conditioning 
+vector:
+\begin{equation}
+    c_k(t) = [\psi(t) \;\|\; e_k] 
+    \in \mathbb{R}^{80}
+    \label{eq:cond_vec}
+\end{equation}
+This single 80-dimensional vector 
+encodes both when the particle is in 
+its trajectory and which prior it is 
+flowing toward. It is passed into 
+every FiLM block to modulate the 
+network's behaviour at each processing 
+stage.
+
+\subsection{FiLM-Conditioned Residual 
+Blocks}
+
+The core of the network is a stack of 
+$L = 6$ Feature-wise Linear Modulation 
+(FiLM) blocks \citep{perez2018}. 
+Each block takes the current hidden 
+state $h \in \mathbb{R}^{256}$ and the 
+conditioning vector $c_k(t)$ as inputs, 
+and produces an updated hidden state 
+$h' \in \mathbb{R}^{256}$.
+
+FiLM conditioning works by learning 
+to scale and shift the hidden state 
+differently for each prior and time. 
+Two small linear layers produce a 
+scale vector $\gamma$ and a shift 
+vector $\beta$ from the conditioning 
+vector:
+\begin{equation}
+    \gamma = W_\gamma\, c_k(t) + 
+    b_\gamma \in \mathbb{R}^{1024}, 
+    \qquad 
+    \beta = W_\beta\, c_k(t) + 
+    b_\beta \in \mathbb{R}^{1024}
+\end{equation}
+These are applied elementwise to the 
+output of an inner MLP acting on the 
+normalised hidden state:
+\begin{equation}
+    h' = \gamma \odot 
+    \sigma\!\left(
+    W_2\,\sigma(W_1\,
+    \mathrm{LN}(h) + b_1) + b_2
+    \right) 
+    + \beta + h
+    \label{eq:film_block}
+\end{equation}
+where $\mathrm{LN}$ denotes Layer 
+Normalisation \citep{ba2016}, 
+$\odot$ denotes elementwise 
+multiplication, and the final $+h$ 
+is the residual skip connection. The 
+inner MLP has hidden dimension 
+$4 \times 256 = 1024$, which gives 
+the network enough capacity to compute 
+complex transformations of the hidden 
+state before the FiLM modulation is 
+applied.
+
+The residual connection $+h$ is 
+important for two reasons. First, it 
+allows gradients to flow directly 
+from the output to the input during 
+backpropagation, which helps training 
+deep networks. Second, it means the 
+block only needs to learn the 
+difference between the input and the 
+desired output rather than the output 
+from scratch, which is a much easier 
+learning problem. The FiLM parameters 
+$\gamma$ and $\beta$ then determine 
+how much and in which direction this 
+residual is adjusted for each prior 
+and time. Table~\ref{tab:film_block} 
+summarises the FiLM block configuration.
+
+\begin{table}[h]
+\centering
+\caption{FiLM block configuration.}
+\label{tab:film_block}
+{\singlespacing
+\begin{tabular}{lll}
+\hline
+Parameter & Value & Role \\
+\hline
+Input dimension & 256 
+& Hidden state width \\
+Inner MLP hidden dim & 1024 
+& $4\times$ hidden expansion \\
+Conditioning dimension & 80 
+& $[\psi(t) \| e_k]$ \\
+Normalisation & LayerNorm 
+& Stabilises training \\
+Activation & SiLU 
+& Smooth non-linearity \\
+Dropout & 0.05 
+& Prevents overfitting \\
+Residual connection & Yes 
+& Gradient flow \\
+Number of blocks & 6 
+& Processing depth \\
+\hline
+\end{tabular}}
+\end{table}
+
+\subsection{Output Head and Velocity 
+Prediction}
+
+After passing through all $L = 6$ FiLM 
+blocks, the final hidden state 
+$h_L \in \mathbb{R}^{256}$ is passed 
+through a single linear layer to 
+produce the velocity prediction:
+\begin{equation}
+    v_\theta(z, t, k) = 
+    W_\text{head}\, h_L + b_\text{head} 
+    \in \mathbb{R}^D
+\end{equation}
+This velocity vector tells a particle 
+at position $z$ at time $t$ under prior 
+$k$ exactly how to move. When the 
+network is well trained, integrating 
+this velocity field from $t = 0$ to 
+$t = 1$ using an ODE solver transports 
+a sample from the prior $\pi_k$ to 
+a sample from the approximate posterior 
+$q^\theta_k$ under prior $\pi_k$, with 
+$\mathcal{N}(0, I)$ used as the source 
+for the synthetic 2D experiments where 
+no likelihood is defined.
+
+\subsection{Dataset-Specific 
+Configurations}
+
+The input dimension $D$ and number of 
+priors $K$ vary by dataset. All other 
+parameters are fixed as in 
+Table~\ref{tab:common_arch}. 
+Table~\ref{tab:dataset_arch} summarises 
+the dataset-specific configurations.
+
+\begin{table}[h]
+\centering
+\caption{Dataset-specific configurations. 
+All other parameters follow 
+Table~\ref{tab:common_arch}.}
+\label{tab:dataset_arch}
+{\singlespacing
+\begin{tabular}{llll}
+\hline
+Dataset & Input dim $D$ & 
+Priors $K$ & Training steps \\
+\hline
+German Credit (low) & 25 & 5 & 20{,}000 \\
+German Credit (full) & 25 & 5 & 20{,}000 \\
+Radon MN & 2 & 3 & 10{,}000 \\
+Old Faithful & 2 & 3 & 10{,}000 \\
+Eight-Ring & 2 & 5 & 10{,}000 \\
+Two-Arm Spirals & 2 & 5 & 10{,}000 \\
+Two Moons & 2 & 5 & 10{,}000 \\
+\hline
+\end{tabular}}
+\end{table}
+
+The parameter count of the network scales 
+with $D$ only through the input projection 
+and output head layers, which are small 
+relative to the total. For German Credit 
+with $D = 25$ the total parameter count 
+is approximately 1.2 million, and for 
+the 2D datasets it is approximately 1.1 
+million. The difference is negligible, 
+confirming that the shared architecture 
+provides comparable capacity across all 
+experimental settings.
+
+\section{Training Procedure}
+
+The two-phase training procedure is identical 
+across all experiments, with the following 
+dataset-specific variations. For German Credit, 
+HMC is run separately for the low-data 
+($n = 75$) and full-data ($n = 700$) training 
+sets, producing different posterior caches for 
+each regime. For Minnesota Radon and Old 
+Faithful, HMC is run on the respective training 
+splits with the same hyperparameters. For the 
+synthetic 2D datasets, posterior samples are 
+drawn directly from the dataset distribution 
+under each prior perturbation rather than from 
+an HMC chain, since there is no likelihood 
+function in the Bayesian sense. The number of 
+training steps varies by input dimensionality 
+as shown in Table~\ref{tab:dataset_arch}: 
+20,000 steps for the 25-dimensional German 
+Credit problems and 10,000 steps for all 
+2-dimensional problems.
+
+\subsection{Phase 1: Posterior Sample 
+Generation via HMC}
+
+For each prior $\pi_k$ in the credal 
+set, posterior samples are generated 
+using a self-contained Hamiltonian Monte 
+Carlo sampler implemented in PyTorch, 
+which uses automatic differentiation 
+to compute the gradient of the log 
+posterior without requiring manual 
+derivation. HMC is chosen because it 
+uses gradient information to make 
+large, informed proposals in parameter 
+space, producing lower autocorrelation 
+and faster mixing than random walk 
+methods such as Metropolis-Hastings 
+\citep{neal2011}. The full procedure is 
+illustrated in Figure~\ref{fig:diagram_hmc}.
+
+\input{diagram_hmc}
+
+Each HMC transition proceeds as follows. 
+A momentum vector $p \sim \mathcal{N}(0, I)$ 
+is sampled, and the Hamiltonian is defined 
+as:
+\begin{equation}
+    H(\theta, p) = -\log \pi_k(\theta) 
+    - \log \mathcal{L}(x \mid \theta) 
+    + \frac{1}{2}\|p\|^2
+\end{equation}
+The leapfrog integrator then evolves 
+$(\theta, p)$ for $L$ steps of size 
+$\varepsilon$, and the proposal is 
+accepted or rejected by a Metropolis 
+correction based on the change in 
+Hamiltonian. The HMC configuration 
+is summarised in 
+Table~\ref{tab:hmc_config}.
+
+\begin{table}[h]
+\centering
+\caption{HMC configuration for posterior 
+sample generation. The same settings are 
+used for all priors and datasets.}
+\label{tab:hmc_config}
+{\singlespacing
+\begin{tabular}{lll}
+\hline
+Parameter & Value & Role \\
+\hline
+Samples per prior & 3{,}000 
+& Size of posterior cache \\
+Warmup steps & 1{,}000 
+& Burn-in period \\
+Step size $\varepsilon$ & 0.005 
+& Leapfrog step size \\
+Leapfrog steps $L$ & 15 
+& Steps per transition \\
+Initialisation & $\theta = 0$ 
+& Starting point \\
+Backend & PyTorch autograd 
+& Gradient computation \\
+\hline
+\end{tabular}}
+\end{table}
+
+The warmup period of 1{,}000 steps 
+allows the chain to move away from 
+the initialisation at zero and reach 
+the high-probability region of the 
+posterior before samples are retained. 
+The 3{,}000 post-warmup samples are 
+saved to disk as a cache and reused 
+across all training runs, so HMC is 
+run only once per prior per dataset 
+configuration. During training, the 
+flow model draws batches from this 
+cache via random sampling with 
+replacement.
+
+\subsection{Phase 2: Conditional Flow 
+Matching Training}
+
+With posterior samples cached for each 
+prior, the velocity field $v_\theta$ is 
+trained using the conditional flow 
+matching objective derived in 
+Section~2.6. The full training loop is 
+illustrated in 
+Figure~\ref{fig:diagram_cfm}, and each 
+step is described in detail below.
+
+\input{diagram_cfm}
+
+At each training step the following 
+procedure is followed:
+
+\begin{enumerate}[noitemsep]
+    \item Sample a prior index 
+    $k \sim \mathcal{U}\{1, \ldots, K\}$ 
+    uniformly at random
+    \item Draw a target sample 
+    $z_1 \sim q^*_k$ from the HMC 
+    posterior cache for prior $\pi_k$
+    \item Draw a source sample 
+    $z_0 \sim \pi_k$ from the prior 
+    distribution directly, and clip 
+    to $[-C, C]$ with $C = 15.0$ to 
+    prevent extreme outliers from 
+    heavy-tailed priors such as 
+    Cauchy destabilising training
+    \item Sample a time 
+    $t \sim \mathcal{U}[\varepsilon, 
+    1-\varepsilon]$ with 
+    $\varepsilon = 10^{-4}$ to avoid 
+    boundary effects at $t = 0$ 
+    and $t = 1$
+    \item Compute the interpolant 
+    $z_t = (1-t)z_0 + tz_1$ and the 
+    target velocity $u = z_1 - z_0$
+    \item Compute the Huber loss 
+    between the predicted and target 
+    velocity:
+    \begin{equation}
+        \ell(\theta) = 
+        \mathrm{HuberLoss}
+        (v_\theta(z_t, t, k),\; 
+        z_1 - z_0)
+        \label{eq:huber_loss}
+    \end{equation}
+    \item Backpropagate and update 
+    $\theta$ with AdamW, clipping 
+    gradients to maximum norm 1.0
+\end{enumerate}
+
+The source distribution is the prior 
+$\pi_k$ rather than a standard Gaussian 
+$\mathcal{N}(0, I)$. This is the 
+natural choice for Bayesian inference: 
+the flow only needs to learn the update 
+from the prior to the posterior, which 
+is a much smaller distributional shift 
+than transporting from a standard 
+Gaussian. For well-specified priors 
+such as Gaussian with $\sigma = 1.0$, 
+the prior and posterior are already 
+close, and the flow learns a small 
+correction. For misspecified priors 
+such as GaussianWide with $\sigma = 1.5$, 
+the shift is larger and more training 
+steps are required.
+
+The Huber loss is used in place of the 
+mean squared error of 
+equation~\eqref{eq:cfm_linear} for 
+robustness to outlier velocities. For 
+heavy-tailed priors such as Cauchy and 
+Student-T, occasional extreme source 
+samples $z_0$ can produce very large 
+target velocities $z_1 - z_0$ even 
+after clipping. The Huber loss treats 
+errors below a threshold $\delta$ as 
+squared loss and errors above it as 
+linear loss, reducing the influence of 
+these outlier velocities on the gradient 
+without discarding them entirely. The 
+threshold is set to $\delta = 5.0$. 
+This substitution is a practical 
+heuristic: it breaks the exact gradient 
+equivalence of 
+Theorem~\ref{thm:fm_equivalence}, which 
+is proved for the squared error 
+objective, but the equivalence is 
+preserved approximately for velocities 
+below the threshold where the two 
+losses agree.
+\subsection{Training Details and 
+Convergence}
+
+Training is run for a fixed number of 
+steps rather than to a convergence 
+criterion, with 20,000 steps for the 
+25-dimensional German Credit problems 
+and 10,000 steps for the 2-dimensional 
+problems. These step counts were 
+determined by monitoring the training 
+loss and confirming that it had 
+stabilised before the end of training. 
+The training configuration is 
+summarised in Table~\ref{tab:train_config}.
+
+\begin{table}[h]
+\centering
+\caption{Training configuration for 
+the conditional flow matching model.}
+\label{tab:train_config}
+{\singlespacing
+\begin{tabular}{lll}
+\hline
+Parameter & Value & Role \\
+\hline
+Optimiser & AdamW & Weight update \\
+Learning rate & $1 \times 10^{-3}$ 
+& Step size \\
+Weight decay & $1 \times 10^{-5}$ 
+& L2 regularisation \\
+Batch size & 512 & Samples per step \\
+Gradient clip & 1.0 (max norm) 
+& Training stability \\
+Loss function & Huber ($\delta=1.0$) 
+& Robust regression \\
+Source clip & $C = 5.0$ 
+& Heavy-tail robustness \\
+Time epsilon & $\epsilon = 10^{-4}$ 
+& Boundary avoidance \\
+Steps (2D) & 10{,}000 & \\
+Steps (25D) & 20{,}000 & \\
+\hline
+\end{tabular}}
+\end{table}
+
+All models are trained on a single 
+device, with MPS used on Apple Silicon 
+hardware and CUDA used where available, 
+falling back to CPU otherwise. Each 
+training run is seeded for reproducibility 
+using the same seed for PyTorch, NumPy, 
+and Python's random module. Different 
+seeds produce different random subsamples 
+of the training data (for the low-data 
+German Credit regime) and different 
+random draws from the posterior cache 
+during training.
+
+\section{Credal Weight Optimisation}
+
+After training the conditional flow 
+matching model, the $K$ approximate 
+posteriors $q^\theta_1, \ldots, 
+q^\theta_K$ are combined into a credal 
+mixture by optimising the mixture 
+weights $w \in \Delta_{K-1}$ on a 
+held-out validation set. This section 
+describes the shared objective, the 
+eight optimisation algorithms compared, 
+and the practical implementation.
+
+\subsection{The Shared Objective}
+
+All eight algorithms optimise the same 
+objective: minimise the held-out mixture 
+negative log likelihood over the simplex:
+\begin{equation}
+    \hat{w} = \argmin_{w \in \Delta_{K-1}} 
+    \hat{R}_N(w) = -\frac{1}{N} 
+    \sum_{i=1}^N \log \sum_{k=1}^K 
+    w_k\, m^\theta_k(x_i)
+    \label{eq:weight_obj}
+\end{equation}
+where $x_1, \ldots, x_N$ are held-out 
+validation observations and $m^\theta_k(x_i)$ 
+is the predictive log-density of component 
+$k$ at observation $x_i$.
+
+To avoid recomputing the predictive 
+densities at every iteration, the matrix 
+$\mathbf{L} \in \mathbb{R}^{N \times K}$ 
+of log predictive densities is 
+precomputed once before optimisation:
+\begin{equation}
+    \mathbf{L}_{ik} = \log m^\theta_k(x_i), 
+    \quad i = 1, \ldots, N, 
+    \quad k = 1, \ldots, K
+    \label{eq:logpk}
+\end{equation}
+All subsequent computations use 
+$\mathbf{L}$ directly, making each 
+iteration cheap regardless of the 
+complexity of the flow model. The 
+mixture NLL for a given weight vector 
+$w$ is then computed using the 
+log-sum-exp trick for numerical 
+stability:
+\begin{equation}
+    \hat{R}_N(w) = -\frac{1}{N} 
+    \sum_{i=1}^N \mathrm{logsumexp}_k
+    \left(\mathbf{L}_{ik} + \log w_k
+    \right)
+    \label{eq:nll_logsumexp}
+\end{equation}
+
+The gradient of $\hat{R}_N(w)$ with 
+respect to $w_k$ is:
+\begin{equation}
+    \frac{\partial \hat{R}_N}{\partial w_k} 
+    = -\frac{1}{N} \sum_{i=1}^N 
+    \frac{m^\theta_k(x_i)}
+    {\sum_j w_j m^\theta_j(x_i)}
+    = -\frac{1}{N} \sum_{i=1}^N r_{ik}(w)
+    \label{eq:nll_gradient}
+\end{equation}
+where $r_{ik}(w)$ is the responsibility 
+of component $k$ for observation $x_i$ 
+under weights $w$:
+\begin{equation}
+    r_{ik}(w) = \frac{w_k\, 
+    m^\theta_k(x_i)}{\sum_j w_j\, 
+    m^\theta_j(x_i)}
+    \label{eq:responsibilities}
+\end{equation}
+The responsibilities are computed in 
+log space for numerical stability and 
+are used by several of the algorithms 
+below.
+
+\subsection{Optimisation Algorithms}
+
+Eight algorithms are compared, ranging 
+from the naive baselines of uniform 
+weighting and best-single selection to 
+principled optimisation methods on the 
+simplex. The algorithms are grouped by 
+type.
+
+\paragraph{Baseline methods.}
+
+\textit{Uniform} assigns equal weight 
+$w_k = 1/K$ to all components without 
+any optimisation. This is the simplest 
+possible credal mixture and serves as 
+a lower bound on performance.
+
+\textit{Best-single} selects the single 
+component with the lowest held-out NLL 
+and assigns it weight 1.0. Formally:
+\begin{equation}
+    \hat{w} = e_{k^*}, \quad 
+    k^* = \argmin_k\, 
+    \hat{R}_N(e_k)
+\end{equation}
+where $e_k$ is the $k$-th standard 
+basis vector. This is the algorithm 
+a practitioner would use if they 
+selected a single prior by held-out 
+validation, and it is the primary 
+baseline against which the mixture 
+algorithms are compared.
+
+\paragraph{EM algorithm.}
+
+Among the weight optimisation algorithms 
+evaluated in this thesis, EM is the 
+primary recommended method. It treats 
+the mixture component index as a latent 
+variable and alternates between computing 
+responsibilities (E-step) and updating 
+weights (M-step), with a closed-form 
+update that requires no learning rate 
+and is guaranteed to decrease the 
+mixture NLL at every iteration 
+\citep{dempster1977}. The procedure 
+is illustrated in 
+Figure~\ref{fig:diagram_em}.
+
+\input{diagram_em}
+
+The E-step computes the responsibility 
+of each component $k$ for each 
+observation $x_i$:
+\begin{equation}
+    r_{ik}^{(t)} = \frac{w_k^{(t)}\, 
+    m^\theta_k(x_i)}{\sum_j w_j^{(t)}\, 
+    m^\theta_j(x_i)}
+    \label{eq:em_estep}
+\end{equation}
+The M-step updates the weights as the 
+mean responsibility across all 
+observations:
+\begin{equation}
+    w_k^{(t+1)} = \frac{1}{N} 
+    \sum_{i=1}^N r_{ik}^{(t)}
+    \label{eq:em_mstep}
+\end{equation}
+This update has a closed form, requires 
+no learning rate, and is guaranteed to 
+decrease the mixture NLL at every 
+iteration. The algorithm runs for up 
+to 200 iterations with early stopping 
+when the change in NLL falls below 
+$10^{-10}$, and is initialised at 
+uniform weights $w_k = 1/K$. EM 
+consistently achieves the lowest 
+worst-case regret among all algorithms 
+evaluated in Chapter~4, making it the 
+recommended default for credal weight 
+selection in practice.
+
+\paragraph{Gradient-based methods.}
+
+\textit{Projected gradient descent} 
+(PGD) applies gradient descent with 
+momentum followed by projection onto 
+the simplex \citep{duchi2008}. 
+Starting from uniform weights:
+\begin{equation}
+    v^{(t+1)} = \mu\, v^{(t)} + 
+    \nabla_w \hat{R}_N(w^{(t)})
+\end{equation}
+\begin{equation}
+    w^{(t+1)} = \Pi_{\Delta_{K-1}}
+    \left(w^{(t)} - \alpha\, 
+    v^{(t+1)}\right)
+\end{equation}
+where $\Pi_{\Delta_{K-1}}$ denotes 
+projection onto the simplex, $\mu = 0.9$ 
+is the momentum coefficient, and 
+$\alpha = 0.05$ is the learning rate. 
+The simplex projection is computed 
+using the algorithm of \citet{duchi2008} in $\mathcal{O}(K \log K)$ time. 
+The algorithm runs for 400 iterations.
+
+\textit{Mirror descent with 
+exponentiated gradients} uses a 
+multiplicative update that maintains 
+positivity and the simplex constraint 
+implicitly, without requiring projection:
+\begin{equation}
+    w_k^{(t+1)} = \frac{w_k^{(t)} 
+    \exp\!\left(-\alpha\, 
+    \frac{\partial \hat{R}_N}
+    {\partial w_k}(w^{(t)})\right)}
+    {\sum_j w_j^{(t)} 
+    \exp\!\left(-\alpha\, 
+    \frac{\partial \hat{R}_N}
+    {\partial w_j}(w^{(t)})\right)}
+    \label{eq:mirror_descent}
+\end{equation}
+with learning rate $\alpha = 0.05$ 
+and 400 iterations. Mirror descent 
+is the natural algorithm for the 
+simplex under the negative entropy 
+geometry \citep{beck2003}
+but is known to be sensitive to the 
+learning rate choice.
+
+\paragraph{Frank-Wolfe.}
+
+The Frank-Wolfe algorithm \citet{frank1956} avoids projection by 
+using a linear oracle to find the 
+best single component at each step 
+and then mixing the current iterate 
+with that component:
+\begin{equation}
+    s^{(t)} = e_{k^*}, \quad 
+    k^* = \argmin_k\, 
+    \nabla_w \hat{R}_N(w^{(t)})^\top 
+    e_k
+\end{equation}
+\begin{equation}
+    w^{(t+1)} = (1-\gamma^{(t)})\, 
+    w^{(t)} + \gamma^{(t)}\, s^{(t)}
+\end{equation}
+where the step size $\gamma^{(t)}$ 
+is selected by a line search over 
+$[0,1]$. The Frank-Wolfe algorithm 
+has a natural sparse solution 
+structure: it tends to concentrate 
+weight on a small number of components, 
+which mirrors the expected behaviour 
+when one prior dominates. It runs for 
+200 iterations.
+
+\paragraph{Coordinate pair search.}
+
+The coordinate pair search algorithm 
+randomly selects two components $(a, b)$ 
+at each iteration and finds the optimal 
+redistribution of their combined mass 
+$m = w_a + w_b$ by a 1D grid search:
+\begin{equation}
+    (w_a^*, w_b^*) = \argmin_{t \in 
+    \{0, \frac{1}{G}, \ldots, 1\}} 
+    \hat{R}_N(w \text{ with } 
+    w_a = tm,\, w_b = (1-t)m)
+\end{equation}
+with grid size $G = 50$, run for 300 
+iterations with random pair selection. 
+This is a coordinate descent method 
+that avoids computing the full gradient 
+by solving a sequence of one-dimensional 
+subproblems.
+
+\paragraph{Grid search.}
+
+Grid search exhaustively evaluates 
+the NLL at all weight vectors on a 
+regular grid over $\Delta_{K-1}$ with 
+step size 0.05, returning the minimiser. 
+For $K = 5$ this grid has $\binom{24}{4} 
+= 10{,}626$ points. Grid search is 
+guaranteed to find the global minimum 
+within the grid resolution and serves 
+as a near-exhaustive baseline. It is 
+computationally feasible only for 
+small $K$.
+
+\subsection{Algorithm Summary}
+
+Table~\ref{tab:weight_algorithms} 
+summarises all eight algorithms with 
+their key hyperparameters.
+
+\begin{table}[h]
+\centering
+\caption{Credal weight optimisation 
+algorithms. All algorithms optimise 
+the same held-out NLL objective over 
+$\Delta_{K-1}$.}
+\label{tab:weight_algorithms}
+{\singlespacing
+\begin{tabular}{lllll}
+\hline
+Algorithm & Type & Iterations 
+& Hyperparameters & Constraint \\
+\hline
+Uniform & Baseline & -- 
+& -- & Implicit \\
+Best-single & Baseline & -- 
+& -- & Vertex \\
+EM & Closed-form & 200 
+& tol $= 10^{-10}$ & Implicit \\
+Proj. GD & Gradient & 400 
+& lr $= 0.05$, $\mu = 0.9$ 
+& Projection \\
+Mirror descent & Gradient & 400 
+& lr $= 0.05$ & Implicit \\
+Frank-Wolfe & Conditional grad & 200 
+& line search & Implicit \\
+Coord. pair & Coordinate & 300 
+& grid $= 50$ & Implicit \\
+Grid search & Exhaustive & -- 
+& step $= 0.05$ & Exhaustive \\
+\hline
+\end{tabular}}
+\end{table}
+
+All algorithms are initialised at 
+uniform weights $w_k = 1/K$ and operate 
+on the precomputed log-density matrix 
+$\mathbf{L}$. The same validation set 
+and the same $\mathbf{L}$ matrix are 
+used for all algorithms, ensuring a 
+fair comparison. Results are reported 
+across multiple random seeds, where 
+each seed determines a different 
+training data subsample and a different 
+draw from the HMC posterior cache.

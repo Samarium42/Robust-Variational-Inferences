@@ -1,0 +1,194 @@
+\chapter{Conclusion}
+\label{chap:conclusion}
+
+\section{Summary of Contributions}
+
+This thesis investigated whether the KL 
+convexity guarantee (that a mixture over 
+a credal set of posteriors performs at 
+least as well as the best individual 
+component, remains empirically visible 
+when posteriors are approximated by 
+flow matching models and mixture weights 
+are selected by held-out negative log 
+likelihood. The answer is yes, under 
+the right architectural and statistical 
+conditions.
+
+Four concrete contributions were made 
+in pursuit of this question. First, a 
+shared-backbone flow matching architecture 
+conditioned on a discrete prior index 
+was designed and validated, producing 
+posterior approximations with comparable 
+quality across all $K$ priors 
+simultaneously and outperforming 
+separately trained flows on predictive 
+performance, training stability, and 
+parameter efficiency. Second, held-out 
+NLL was established as the correct 
+weight selection objective, replacing 
+proxy divergence objectives that 
+introduce misalignment between the 
+selection criterion and the theoretical 
+guarantee. Third, a systematic empirical 
+evaluation across two data regimes, two 
+real datasets, and three synthetic 
+geometries confirmed all three 
+hypotheses: the credal mixture achieves 
+near-oracle worst-case regret in the 
+prior-sensitive regime (0.0005 nats 
+under EM, compared to 0.0039 for 
+best-single), provides no benefit or 
+harm in the prior-insensitive regime, 
+and EM is the most reliable weight 
+optimisation algorithm. Fourth, the 
+conditions under which the guarantee 
+is and is not visible were characterised 
+concretely: prior sensitivity is 
+necessary, a shared backbone is 
+necessary, and likelihood-consistent 
+weight selection is necessary. When 
+any of these conditions is violated, 
+the mixture either degrades or provides 
+no improvement over single-prior 
+inference.
+
+\section{Limitations}
+
+Several limitations of the present 
+work should be acknowledged. The 
+primary result is demonstrated on a 
+single dataset and problem class, 
+Bayesian logistic regression on German 
+Credit with $n = 75$. While the 
+theoretical framework is general, the 
+empirical evidence for the guarantee 
+visibility claim rests on this setting, 
+and replication on other high-dimensional 
+Bayesian problems with genuine prior 
+sensitivity is needed before broad 
+conclusions can be drawn.
+
+The credal set is finite and 
+practitioner-specified. The guarantee 
+holds only over the $K$ priors that 
+are explicitly included; if the true 
+data-generating prior lies outside the 
+credal set, the mixture provides no 
+additional robustness beyond the best 
+included component. The choice of 
+which priors to include remains an 
+open problem that the present framework 
+does not address.
+
+The approximation error $\eta$ in 
+Theorem~\ref{thm:approx_mixture_ch2} 
+was validated empirically as small 
+and approximately uniform across priors 
+(roughly 0.015 nats relative to HMC), 
+but was not bounded theoretically as 
+a function of network capacity or 
+training data. The guarantee therefore 
+rests on an empirical rather than a 
+theoretical characterisation of the 
+approximation quality.
+
+Finally, Frank-Wolfe degenerates to 
+single-component selection under the 
+harmonic step size schedule, and 
+mirror descent is sensitive to the 
+learning rate. A practitioner who 
+selects these algorithms without 
+careful tuning would not realise the 
+mixture benefit. EM is robust to 
+these failure modes, but its 
+closed-form update is specific to 
+the mixture NLL objective and does 
+not generalise to other combination 
+criteria.
+
+\section{Future Work}
+
+The most natural extension is to 
+continuous credal sets, replacing 
+the finite discrete set of $K$ priors 
+with a parametric family 
+$\{\pi_\lambda : \lambda \in \Lambda\}$. 
+This would require integrating the 
+mixture weight over a continuous 
+simplex, which connects directly to 
+the generalised Bayesian inference 
+framework of Knoblauch et al.\ (2022) 
+and the stochastic interpolant 
+formulation of Albergo and 
+Vanden-Eijnden (2022). The KL 
+convexity guarantee extends to 
+continuous mixtures under mild 
+regularity conditions, and the 
+flow matching architecture is 
+well-suited to conditioning on a 
+continuous $\lambda$ rather than a 
+discrete index.
+
+Preliminary experiments on the Breast 
+Cancer Wisconsin Diagnostic dataset 
+(UCI, $D = 31$, $n = 75$) provide 
+initial evidence that the H1 result 
+generalises to higher-dimensional 
+medical classification settings: all 
+principled mixture algorithms 
+outperformed the val-selected 
+best-single strategy on all five 
+seeds, with mean improvements of 
+0.003--0.004 nats. However, in this 
+more diffuse posterior regime 
+(2.4:1 data-to-parameter ratio) 
+uniform weighting outperformed 
+optimised weight selection on 
+average, suggesting that the 
+relative performance of weight 
+optimisation algorithms depends on 
+the degree of posterior 
+concentration. Characterising 
+exactly when optimised weighting 
+dominates uniform averaging, and 
+deriving a criterion for selecting 
+between them, is a direction for 
+future work.
+
+A second direction is a theoretical 
+bound on the approximation gap $\eta$ 
+as a function of network capacity, 
+training steps, and the divergence 
+between the prior and the posterior. 
+Such a bound would make the conditions 
+in Theorem~\ref{thm:approx_mixture_ch2} 
+verifiable without requiring a separate 
+MCMC reference, which is the main 
+computational overhead of the current 
+evaluation pipeline.
+
+Third, the approach could be extended 
+to Bayesian neural networks, where 
+prior sensitivity has been shown to 
+persist even at scale (Fortuin et 
+al., 2021; Wenzel et al., 2020). The 
+shared backbone architecture scales 
+naturally to higher-dimensional 
+parameter spaces, and the combination 
+of flow matching with credal mixtures 
+could provide a principled alternative 
+to cold posteriors and other ad hoc 
+robustness adjustments currently 
+used in deep Bayesian models.
+
+Finally, online credal mixture 
+updating, in which mixture weights 
+are revised as new data arrives 
+rather than computed once on a 
+fixed validation set, would extend 
+the framework to streaming and 
+continual learning settings where 
+the most informative prior may 
+shift over time.

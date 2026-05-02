@@ -1,0 +1,56 @@
+Device: mps  |  CNF timing on: cpu
+  Subsampled training data: 75 / 700 observations
+  Loading cached posterior: gaussian
+  Loading cached posterior: gaussian_wide
+  Loading cached posterior: cauchy
+  Loading cached posterior: laplace
+  Loading cached posterior: student_t
+
+============================================================
+  Per-step timing benchmark  (200 trials each)
+============================================================
+
+Timing flow matching step (batch=64)...
+Timing CNF step (10 ODE steps, batch=64)...
+
+  Flow Matching: 11.67 ms/step  (median 9.96ms)
+  CNF Baseline:  139.65 ms/step  (median 137.58ms)
+  Speedup:       12.0x
+
+============================================================
+  Full flow matching training (6000 steps)
+============================================================
+[FM] Step     1/6000  Loss: 0.2703  AvgStepTime: 127.61ms
+[FM] Step   500/6000  Loss: 0.1104  AvgStepTime: 11.48ms
+[FM] Step  1000/6000  Loss: 0.0757  AvgStepTime: 12.84ms
+[FM] Step  1500/6000  Loss: 0.3665  AvgStepTime: 12.27ms
+[FM] Step  2000/6000  Loss: 0.5697  AvgStepTime: 11.79ms
+[FM] Step  2500/6000  Loss: 1.1251  AvgStepTime: 11.85ms
+[FM] Step  3000/6000  Loss: 0.3857  AvgStepTime: 12.54ms
+[FM] Step  3500/6000  Loss: 0.3670  AvgStepTime: 12.30ms
+[FM] Step  4000/6000  Loss: 0.5712  AvgStepTime: 11.84ms
+[FM] Step  4500/6000  Loss: 1.0413  AvgStepTime: 12.25ms
+[FM] Step  5000/6000  Loss: 0.5499  AvgStepTime: 12.27ms
+[FM] Step  5500/6000  Loss: 0.0696  AvgStepTime: 11.77ms
+[FM] Step  6000/6000  Loss: 0.0990  AvgStepTime: 12.37ms
+
+Total FM training time: 106.7s
+
+Evaluating FM test NLL:
+  gaussian: test NLL = 0.658553
+  gaussian_wide: test NLL = 0.808665
+  cauchy: test NLL = 0.695447
+  laplace: test NLL = 0.636953
+  student_t: test NLL = 0.704960
+
+============================================================
+SUMMARY
+============================================================
+  FM  step time:  11.67 ms
+  CNF step time:  139.65 ms  (10 ODE steps)
+  Speedup:        12.0x
+  FM  total time: 106.7s
+  CNF est. total: 1277.0s (never run)
+
+  Saved: out_speed_comparison/speed_comparison_summary.json
+  Saved: out_speed_comparison/speed_comparison.csv

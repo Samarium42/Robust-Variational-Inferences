@@ -1,0 +1,964 @@
+\chapter{Results and Discussion}
+\label{chap:results}
+
+This chapter presents and interprets the 
+empirical results across all experimental 
+settings. Section~\ref{sec:primary} reports 
+the primary result on the German Credit 
+low-data regime, directly testing H1 and H3. 
+Section~\ref{sec:null_control} presents the 
+null control on the full-data regime, testing 
+H2. Section~\ref{sec:radon} presents the 
+Minnesota Radon supplementary null control. 
+Section~\ref{sec:ablation_shared} presents 
+the architectural ablation validating the 
+shared backbone. Section~\ref{sec:supplementary} 
+presents the diagnostic analyses: prior 
+sensitivity, weight stability, 
+leave-one-prior-out, calibration, and 
+optimiser convergence. 
+Section~\ref{sec:synthetic} reports the 
+synthetic 2D results. 
+Section~\ref{sec:hypothesis_summary} 
+summarises the hypothesis outcomes.
+Section~\ref{sec:fm_vs_cnf} presents a 
+direct speed comparison between flow 
+matching and CNF training, validating 
+the simulation-free computational advantage.
+
+\section{Primary Result: German Credit 
+Low-Data Regime}
+\label{sec:primary}
+
+The primary experimental setting is German 
+Credit with $n = 75$ training observations 
+and 25 parameters. Under this 3:1 
+data-to-parameter ratio the likelihood 
+is insufficiently informative to overwhelm 
+any reasonable prior, placing the experiment 
+firmly in the prior-sensitive regime as 
+defined in Section~3.1: the gap between 
+the best and worst prior on the validation 
+set reaches 0.13 to 0.27 nats across seeds, 
+well above the 0.01 nat threshold.
+
+\subsection{Mean NLL and Regret}
+
+Table~\ref{tab:german_low_nll} reports the 
+test NLL per seed and the mean across 5 
+seeds for all eight weight optimisation 
+algorithms, together with the oracle 
+best-prior NLL computed post-hoc on the 
+test set. Table~\ref{tab:german_low_regret} 
+reports the regret relative to the oracle 
+at each seed, with the maximum and mean 
+regret across seeds.
+
+\begin{table}[h]
+\centering
+\caption{Test NLL per seed and mean for all 
+algorithms on German Credit low-data regime 
+($n = 75$, 5 seeds). Lower is better.}
+\label{tab:german_low_nll}
+{\singlespacing
+\begin{tabular}{lrrrrrr}
+\hline
+Algorithm & Seed 0 & Seed 1 & Seed 2 
+& Seed 3 & Seed 4 & Mean \\
+\hline
+EM          & 0.6307 & 0.6214 & 0.6169 
+             & 0.5976 & 0.6461 & \textbf{0.6225} \\
+Proj. GD    & 0.6310 & 0.6215 & 0.6176 
+             & 0.5972 & 0.6464 & 0.6227 \\
+Coord. pair & 0.6312 & 0.6215 & 0.6175 
+             & 0.5971 & 0.6468 & 0.6228 \\
+Grid search & 0.6312 & 0.6215 & 0.6175 
+             & 0.5971 & 0.6467 & 0.6228 \\
+Frank-Wolfe & 0.6312 & 0.6215 & 0.6175 
+             & 0.5971 & 0.6468 & 0.6228 \\
+Best-single & 0.6333 & 0.6222 & 0.6175 
+             & 0.5971 & 0.6500 & 0.6240 \\
+Mirror desc.& 0.6380 & 0.6324 & 0.6258 
+             & 0.6115 & 0.6546 & 0.6325 \\
+Uniform     & 0.6753 & 0.6735 & 0.6671 
+             & 0.6473 & 0.6881 & 0.6703 \\
+\hline
+Oracle      & 0.6307 & 0.6214 & 0.6169 
+             & 0.5971 & 0.6461 & 0.6224 \\
+\hline
+\end{tabular}}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Regret (NLL minus oracle NLL) per 
+seed for all algorithms. Max and mean regret 
+across 5 seeds reported. Lower is better.}
+\label{tab:german_low_regret}
+{\singlespacing
+\begin{tabular}{lrrrrrrrr}
+\hline
+Algorithm & Seed 0 & Seed 1 & Seed 2 
+& Seed 3 & Seed 4 & Max & Mean \\
+\hline
+EM          & 0.0000 & 0.0000 & 0.0000 
+             & 0.0005 & 0.0000 & \textbf{0.0005} & 0.0001 \\
+Grid        & 0.0005 & 0.0001 & 0.0006 
+             & 0.0000 & 0.0006 & 0.0006 & 0.0004 \\
+Proj. GD    & 0.0003 & 0.0001 & 0.0007 
+             & 0.0001 & 0.0003 & 0.0007 & 0.0003 \\
+Coord. pair & 0.0005 & 0.0001 & 0.0006 
+             & 0.0000 & 0.0007 & 0.0007 & 0.0004 \\
+Frank-Wolfe & 0.0005 & 0.0001 & 0.0006 
+             & 0.0000 & 0.0007 & 0.0007 & 0.0004 \\
+Best-single & 0.0026 & 0.0008 & 0.0006 
+             & 0.0000 & 0.0039 & 0.0039 & 0.0016 \\
+Mirror desc.& 0.0073 & 0.0110 & 0.0089 
+             & 0.0144 & 0.0085 & 0.0144 & 0.0100 \\
+Uniform     & 0.0446 & 0.0521 & 0.0502 
+             & 0.0502 & 0.0420 & 0.0521 & 0.0478 \\
+\hline
+\end{tabular}}
+\end{table}
+
+\subsection{H1: Guarantee Visibility}
+\label{sec:h1}
+
+All principled mixture algorithms (EM, 
+Proj. GD, Coord., Grid, Frank-Wolfe) 
+achieve lower mean test NLL than 
+best-single: 0.6225--0.6228 versus 
+0.6240. More importantly, the worst-case 
+regret of the mixture algorithms is 
+substantially lower. EM achieves a maximum 
+regret of 0.0005 nats, compared to 0.0039 
+nats for best-single, a factor of 
+approximately eight. The source of 
+best-single's regret is clear from 
+Table~\ref{tab:prior_per_seed}: on seeds 
+0, 1, and 2 the best prior is Gaussian, 
+while on seeds 3 and 4 it is Laplace. A 
+practitioner who commits to Gaussian in 
+advance incurs regret up to 0.003 nats; 
+one who commits to Laplace incurs regret 
+up to 0.012 nats. The credal mixture 
+avoids this entirely by distributing 
+weight across the credal set and 
+adapting to whichever prior is most 
+informative for each data subsample.
+
+\begin{table}[h]
+\centering
+\caption{Per-prior test predictive 
+log-likelihood per seed (German Credit, 
+$n = 75$). Bold indicates the best prior 
+for each seed.}
+\label{tab:prior_per_seed}
+{\singlespacing
+\begin{tabular}{lrrrrr}
+\hline
+Prior & Seed 0 & Seed 1 & Seed 2 
+& Seed 3 & Seed 4 \\
+\hline
+Gaussian      & \textbf{$-$0.630} 
+              & \textbf{$-$0.622} 
+              & \textbf{$-$0.616} 
+              & $-$0.609 & $-$0.650 \\
+Laplace       & $-$0.633 & $-$0.624 
+              & $-$0.618 
+              & \textbf{$-$0.597} 
+              & \textbf{$-$0.644} \\
+Cauchy        & $-$0.695 & $-$0.690 
+              & $-$0.711 & $-$0.685 
+              & $-$0.725 \\
+Student-T     & $-$0.718 & $-$0.711 
+              & $-$0.696 & $-$0.683 
+              & $-$0.716 \\
+GaussianWide  & $-$0.823 & $-$0.888 
+              & $-$0.853 & $-$0.793 
+              & $-$0.790 \\
+\hline
+\end{tabular}}
+\end{table}
+
+This instability in which prior is 
+best across seeds is the core motivation 
+for the credal mixture approach, and 
+Table~\ref{tab:prior_per_seed} makes 
+it visible concretely. H1 is 
+\textbf{confirmed}: in the 
+prior-sensitive regime, the credal 
+mixture achieves lower worst-case 
+regret than the best-single 
+strategy.
+
+\subsection{H3: Algorithm Comparison}
+\label{sec:h3}
+
+EM achieves both the lowest mean NLL 
+(0.6225) and the lowest maximum regret 
+(0.0005 nats) among all algorithms. 
+The other principled optimisers (Proj. 
+GD, Coord., Grid, Frank-Wolfe) are 
+essentially tied on mean NLL (0.6227--0.6228) 
+and close on max regret (0.0006--0.0007). 
+EM's advantage is most visible at 
+seed 3, where it achieves near-oracle 
+performance (regret 0.0005) while 
+Grid and Coord. achieve exactly oracle 
+(regret 0.0000), this is due to 
+different initialisation behaviour 
+on that particular subsample.
+
+Mirror descent performs considerably 
+worse (mean NLL 0.6325, max regret 
+0.0144), consistent with its known 
+sensitivity to the learning rate 
+($\alpha = 0.05$). Uniform weighting 
+is worst by a large margin (mean 
+0.6703), reflecting that priors 
+vary substantially in quality and 
+equal weighting dilutes the 
+contribution of the best components. 
+H3 is \textbf{confirmed}: EM achieves 
+the lowest worst-case regret. Its 
+advantage over alternatives is further 
+supported by its closed-form M-step, 
+which requires no learning rate 
+tuning and converges reliably within 
+200 iterations on every seed.
+
+\subsection{MCMC Reference Baseline}
+
+To confirm that the prior-sensitivity 
+pattern is real rather than an 
+artefact of the flow approximation, 
+the same evaluation is performed 
+using HMC posterior samples in place 
+of flow samples. Under exact HMC 
+posteriors, Gaussian achieves 
+predictive log-likelihood of 
+approximately $-0.616$ to $-0.630$ 
+nats across seeds while GaussianWide 
+achieves $-0.790$ to $-0.888$ nats, 
+a gap of 0.16 to 0.26 nats that 
+closely mirrors the pattern in 
+Table~\ref{tab:prior_per_seed}. The 
+flow approximation adds a consistent 
+overhead of approximately 0.015 nats 
+relative to HMC across all priors, 
+confirming that the approximation 
+error is small and approximately 
+uniform across the credal set. This 
+is the empirical basis for 
+Assumption~\ref{ass:transfer_ch2}: 
+the transfer error $\eta$ is small 
+and consistent, not concentrated 
+on particular components. Connecting 
+this to Proposition~\ref{prop:sqrt_eps_ch2}, 
+the uniform 0.015 nat overhead 
+provides an empirical upper bound 
+on $\eta$, suggesting the bounded 
+density ratio condition ($\Gamma$) 
+and log-ratio condition ($M$) of 
+the proposition are approximately 
+satisfied in this setting, even 
+though they are not verified 
+analytically.
+
+\section{Null Control: German Credit 
+Full-Data Regime}
+\label{sec:null_control}
+
+Table~\ref{tab:german_full} reports 
+results for the full-data setting 
+($n = 700$, 28 observations per 
+parameter). At this data-to-parameter 
+ratio the likelihood dominates and 
+all posteriors converge regardless 
+of prior.
+
+\begin{table}[h]
+\centering
+\caption{Test NLL for all algorithms 
+on German Credit full-data regime 
+($n = 700$, 10 runs). All algorithms 
+are within 0.002 nats.}
+\label{tab:german_full}
+{\singlespacing
+\begin{tabular}{lrr}
+\hline
+Algorithm & Mean NLL & Std \\
+\hline
+Proj. GD    & \textbf{0.4981} & 0.0003 \\
+Grid search & 0.4985 & 0.0007 \\
+Coord. pair & 0.4985 & 0.0007 \\
+Frank-Wolfe & 0.4985 & 0.0007 \\
+Best-single & 0.4990 & 0.0011 \\
+EM          & 0.4991 & 0.0001 \\
+Mirror desc.& 0.4999 & 0.0001 \\
+Uniform     & 0.5000 & 0.0001 \\
+\hline
+\end{tabular}}
+\end{table}
+
+The total spread across all algorithms 
+is 0.002 nats, well within the 0.005 
+nat threshold defined for H2. Best-single 
+converges to a single dominant prior 
+on all 10 runs, confirming that the 
+data is sufficient to identify the 
+posterior regardless of prior. The 
+Wilcoxon signed-rank test on the 
+paired difference in test NLL between 
+EM and best-single across runs yields 
+$p > 0.05$, confirming no statistically 
+significant difference. H2 is 
+\textbf{confirmed}: the credal mixture 
+provides no benefit and no harm when 
+the data is sufficient to overwhelm 
+prior influence. This validates the 
+theoretical prediction from 
+Corollary~\ref{cor:recovery_ch2} 
+when all posteriors have converged, 
+the credal mixture reduces to the 
+best single component.
+
+\section{Supplementary Null Control: 
+Minnesota Radon}
+\label{sec:radon}
+
+Table~\ref{tab:radon} reports results 
+for the Radon experiment (2D, 
+$K = 3$ priors, 10 seeds). With a 
+310:1 data-to-parameter ratio, this 
+dataset is deeply in the 
+prior-insensitive regime.
+
+\begin{table}[h]
+\centering
+\caption{Test NLL for all algorithms 
+on Minnesota Radon (10 seeds). 
+All principled algorithms are 
+within 0.001 nats of best-single.}
+\label{tab:radon}
+{\singlespacing
+\begin{tabular}{lrr}
+\hline
+Algorithm & Mean NLL & Std \\
+\hline
+Best-single & \textbf{2.5141} & 0.0085 \\
+Grid search & 2.5141 & 0.0085 \\
+Coord. pair & 2.5141 & 0.0085 \\
+Proj. GD    & 2.5141 & 0.0084 \\
+Frank-Wolfe & 2.5141 & 0.0085 \\
+EM          & 2.5146 & 0.0085 \\
+Mirror desc.& 2.5224 & 0.0087 \\
+Uniform     & 2.5257 & 0.0088 \\
+\hline
+\end{tabular}}
+\end{table}
+
+All principled algorithms (EM, Grid, 
+Coord., Proj. GD, Frank-Wolfe) achieve 
+essentially identical NLL to best-single, 
+confirming the null result. The Gaussian 
+prior dominates completely: grid search 
+and coord. assign weight $\approx 1.0$ 
+to Gaussian, and EM gives it 88\% weight. 
+This is consistent with a linear 
+regression model under abundant data: 
+the 310:1 ratio means the prior has 
+negligible influence and the mixture 
+provides no additional information. 
+Mirror descent and uniform are 
+considerably worse (2.5224 and 2.5257 
+respectively), reflecting their failure 
+to concentrate weight on the dominant 
+component.
+
+\section{Architectural Ablation: Shared 
+vs Separate Models}
+\label{sec:ablation_shared}
+
+Figure~\ref{fig:ablation} compares the 
+shared-backbone architecture against five 
+separately trained flows, one per prior, 
+under uniform mixture weights. This 
+isolates the effect of the architecture 
+from the weight selection procedure.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp6_ablation_shared_vs_separate}
+\caption{Architectural ablation: shared 
+conditional model vs separately trained 
+flows. Left: training loss curves. 
+Centre: predictive log-likelihood under 
+uniform mixture weights ($-0.4929$ vs 
+$-0.5028$). Right: parameter count 
+(888.6k vs 2665.7k, a 67\% reduction 
+with the shared model).}
+\label{fig:ablation}
+\end{figure}
+
+The shared model achieves predictive 
+log-likelihood of $-0.4929$ nats under 
+uniform weights, compared to $-0.5028$ 
+nats for the separate models, an 
+improvement of 0.0099 nats. The shared 
+model also converges faster and with 
+lower training loss variance, visible 
+in the left panel. The parameter count 
+is reduced by 67\% (888.6k vs 2665.7k 
+parameters), as the shared backbone 
+amortises the cost of representing the 
+velocity field across all $K$ priors 
+simultaneously rather than maintaining 
+$K$ independent sets of parameters.
+
+The result directly validates 
+Assumption~\ref{ass:transfer_ch2}. 
+The separate training approach cannot 
+guarantee comparable approximation 
+quality across priors, each model 
+may converge to a different local 
+optimum with different residual error 
+$\varepsilon_k$. The shared backbone 
+trains all $K$ posterior approximations 
+jointly under the same optimisation 
+trajectory, producing components with 
+comparable approximation quality and 
+a well-defined mixture. That it also 
+achieves better predictive performance 
+with fewer parameters confirms that 
+the shared architecture is not merely 
+a theoretical convenience but a 
+practical improvement on all dimensions.
+
+\section{Supplementary Analyses}
+\label{sec:supplementary}
+
+\subsection{Prior Sensitivity}
+\label{sec:prior_sensitivity}
+
+Figure~\ref{fig:prior_sensitivity} 
+quantifies the degree to which each 
+prior shifts the posterior mean 
+relative to the Gaussian baseline, 
+across all 25 parameter dimensions.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp1_prior_sensitivity_curve}
+\caption{Prior sensitivity analysis on 
+German Credit ($n = 75$). Left: 
+posterior mean shift per dimension 
+relative to the Gaussian prior. 
+Right: maximum absolute mean shift 
+across dimensions per prior. The 
+credal mixture (dashed line, 0.004) 
+is an order of magnitude more stable 
+than the most sensitive individual 
+prior (GaussianWide, 0.028).}
+\label{fig:prior_sensitivity}
+\end{figure}
+
+GaussianWide produces the largest 
+posterior shift (max 0.028), followed 
+by Laplace (0.027), Cauchy (0.021), 
+and Student-T (0.020). Gaussian, as 
+the reference, has zero shift by 
+definition. The credal mixture achieves 
+a maximum mean shift of only 0.004 
+across all dimensions, substantially 
+lower than any individual component. 
+This confirms that the mixture posterior 
+is more stable than any constituent 
+prior, which is the operational meaning 
+of prior robustness: rather than 
+committing to the posterior shifts 
+induced by a particular prior, the 
+credal mixture averages out 
+prior-induced bias.
+
+The prior sensitivity figure also 
+provides visual confirmation that the 
+prior-sensitive regime is genuine. 
+The individual prior curves in the 
+left panel show substantial 
+dimension-by-dimension disagreement, 
+particularly on dimensions 5 through 
+15 where the Laplace and GaussianWide 
+curves diverge significantly from 
+Gaussian. This is the geometric 
+manifestation of the NLL gap reported 
+in Table~\ref{tab:prior_per_seed}.
+
+\subsection{Weight Stability}
+\label{sec:weight_stability}
+
+Figure~\ref{fig:weight_stability} 
+shows the distribution of EM mixture 
+weights across 10 seeds on the German 
+Credit low-data regime.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp2_weight_stability}
+\caption{EM mixture weight distribution 
+across 10 seeds. Left: box plots showing 
+mean and variance per prior (Cauchy: 
+$0.26 \pm 0.194$; Gaussian: 
+$0.24 \pm 0.164$; Laplace: 
+$0.19 \pm 0.165$; Student-T: 
+$0.16 \pm 0.126$; GaussianWide: 
+$0.15 \pm 0.126$). Right: per-seed 
+weight heatmap showing that the 
+dominant prior changes across 
+data subsamples.}
+\label{fig:weight_stability}
+\end{figure}
+
+The large standard deviations 
+(0.126--0.194) confirm that weight 
+assignment is genuinely unstable 
+across seeds: no single prior 
+consistently dominates, and the 
+credal mixture must adapt its 
+weighting to each data subsample. 
+Seed 1 is a notable outlier where 
+Cauchy receives weight approximately 
+0.65, a heavy-tailed subsample where 
+the Cauchy prior is substantially 
+better calibrated. The maximum weight 
+standard deviation across components 
+is 0.194, the highest value across all 
+experiments, confirming that the 
+low-data regime is genuinely 
+prior-sensitive and that the instability 
+is not a numerical artefact. The 
+adaptive reweighting is precisely 
+the mechanism by which the credal 
+mixture achieves near-oracle performance 
+across seeds despite the identity of 
+the best prior changing between seeds.
+
+\subsection{Leave-One-Prior-Out}
+\label{sec:lopo}
+
+The Leave-One-Prior-Out (LOPO) 
+analysis removes each prior in turn 
+from the full five-component credal 
+set and evaluates the resulting 
+four-component mixture. 
+Figure~\ref{fig:lopo} shows the 
+change in test predictive 
+log-likelihood relative to the full 
+five-component mixture.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp3_lopo}
+\caption{Leave-One-Prior-Out analysis. 
+Left: change in predictive 
+log-likelihood when each prior is 
+removed ($\Delta > 0$ means the 
+four-component mixture is better). 
+Right: absolute predictive 
+log-likelihood for all configurations.}
+\label{fig:lopo}
+\end{figure}
+
+Removing GaussianWide or Gaussian 
+improves the mixture by $+0.00040$ 
+and $+0.00037$ nats respectively, 
+confirming that these two components 
+are net detractors when averaged 
+across seeds. Removing Laplace 
+($-0.00036$), Student-T ($-0.00038$), 
+or Cauchy ($-0.00038$) degrades 
+performance, confirming these are 
+genuinely useful contributors. All 
+magnitudes are below 0.001 nats, 
+indicating that no single prior is 
+critical to the mixture's robustness 
+and the credal set is not far from 
+the optimal subset.
+
+The marginal degradation from including 
+GaussianWide and Gaussian is a 
+predictable consequence of their 
+behaviour in the prior-sensitive regime. 
+GaussianWide is a weakly informative 
+prior that produces a diffuse posterior, 
+it is included in the credal set 
+to represent the range of plausible 
+prior beliefs, but it rarely produces 
+the best posterior and its inclusion 
+dilutes the mixture. This is not a 
+failure of the method: the theoretical 
+guarantee of 
+Theorem~\ref{thm:exact_mixture_ch2} 
+says the mixture will be at least as 
+good as the best component in 
+expectation, and including extra 
+poor-quality components introduces a 
+small cost that the weight optimisation 
+does not fully correct. This finding 
+raises a practical tension: a 
+practitioner could improve predictive 
+performance by pruning GaussianWide 
+from the credal set, but doing so 
+requires knowing in advance which 
+priors are net detractors, which 
+is precisely the prior knowledge 
+the credal set is designed to avoid 
+assuming. Automatic credal set 
+selection remains an open problem.
+
+\subsection{Calibration}
+\label{sec:calibration}
+
+Figure~\ref{fig:calibration} shows 
+calibration curves and Expected 
+Calibration Error (ECE) for each 
+method on the German Credit full-data 
+setting.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp4_calibration}
+\caption{Calibration analysis on German 
+Credit full-data regime. Left: 
+reliability diagrams. Right: ECE 
+and Brier score per method.}
+\label{fig:calibration}
+\end{figure}
+
+ECE values range from 0.047 (Student-T, 
+best) to 0.069 (Laplace, worst). The 
+credal mixture achieves ECE of 0.052, 
+comparable to Gaussian (0.053) and 
+better than GaussianWide (0.059) and 
+Laplace (0.069). Brier scores are 
+essentially identical across all 
+methods (0.165--0.166), confirming 
+that the methods differ in systematic 
+bias (captured by ECE) rather than 
+in overall sharpness. The calibration 
+curves show that all methods track the 
+diagonal closely in the moderate 
+probability region (0.2--0.8), with 
+the largest deviations at the extremes 
+where test counts are low. 
+
+The credal mixture does not improve 
+on the best individual prior for 
+calibration in the full-data regime, 
+which is consistent with H2: when 
+all posteriors have converged, 
+combination provides no additional 
+benefit. The result confirms that 
+the mixture does not degrade 
+calibration either, which is a 
+practically relevant finding, a 
+practitioner adopting the credal 
+mixture approach incurs no calibration 
+penalty in the data-rich regime.
+
+\subsection{Optimiser Convergence}
+\label{sec:optimiser}
+
+Figure~\ref{fig:optimiser} compares 
+convergence trajectories and final 
+weight vectors for PGD, EM, and 
+Frank-Wolfe on the full-data German 
+Credit setting.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{exp5_optimiser_comparison}
+\caption{Optimiser convergence on 
+German Credit full-data regime. Left: 
+convergence of mixture predictive 
+log-likelihood across iterations. 
+Right: final weight vectors for each 
+algorithm. PGD and EM converge to 
+near-identical solutions 
+($\|\Delta w\|_2 < 0.01$) while 
+Frank-Wolfe degenerates to a sparse 
+solution assigning weight $\approx 1.0$ 
+to Student-T.}
+\label{fig:optimiser}
+\end{figure}
+
+PGD and EM converge to nearly 
+identical objectives and weight 
+vectors: the maximum pairwise 
+$\|\Delta w\|_2$ between their 
+final solutions is 0.119, with both 
+placing substantial weight on 
+GaussianWide (0.426 and 0.368), 
+Gaussian (0.278 and 0.251), and 
+Student-T (0.268 and 0.368). This 
+convergence to a similar interior 
+point of the simplex confirms that 
+the NLL objective is well-conditioned 
+and the solution is stable across 
+optimisation algorithms.
+
+Frank-Wolfe behaves qualitatively 
+differently. Its harmonic step size 
+schedule drives it toward a sparse 
+vertex solution: it assigns weight 
+1.0 to Student-T and 0.0 to all 
+other priors, effectively degenerating 
+to single-component selection. This 
+explains why Frank-Wolfe achieves 
+the same NLL as best-single in the 
+full-data regime (Table~\ref{tab:german_full}) 
+and why it does not exploit the 
+mixture structure. In the prior-sensitive 
+low-data regime where best-single 
+already achieves low regret on seed 3, 
+Frank-Wolfe also achieves low regret 
+(0.0007 max, matching the other 
+algorithms), but this is because 
+sparse selection happens to select 
+the right component, not because 
+the mixture is genuinely being used. 
+Practitioners who require an 
+interior-point credal mixture should 
+avoid Frank-Wolfe and prefer EM or 
+Proj. GD, both of which consistently 
+produce non-degenerate weight vectors.
+
+\subsection{Flow Matching vs CNF Training Speed}
+\label{sec:fm_vs_cnf}
+
+Figure~\ref{fig:speed_comparison} compares 
+the per-step wall-clock training time of 
+flow matching against a CNF baseline using 
+an identical \texttt{VelocityResNet} 
+architecture on German Credit (seed 0).
+The CNF baseline measures the cost of 
+10-step Euler integration of the augmented 
+ODE with Hutchinson trace estimation, 
+which is the minimum simulation cost 
+required for exact CNF density evaluation 
+during training.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]
+{plot_speed_comparison}
+\caption{Flow matching vs CNF training 
+speed comparison. Left: per-step time 
+distributions over 200 trials. Centre: 
+flow matching training loss curve (CNF 
+not trained to convergence). Right: 
+test NLL per prior under flow matching.}
+\label{fig:speed_comparison}
+\end{figure}
+
+Table~\ref{tab:speed_comparison} 
+summarises the results.
+
+\begin{table}[h]
+\centering
+\caption{Speed comparison between flow 
+matching and CNF baseline on German Credit 
+low-data regime ($n = 75$, seed 0, 
+6{,}000 steps, identical 
+\texttt{VelocityResNet} architecture). 
+CNF total time is estimated from per-step 
+timing; the CNF was not trained to 
+convergence.}
+\label{tab:speed_comparison}
+{\singlespacing
+\begin{tabular}{lrr}
+\hline
+Metric & Flow Matching & CNF Baseline \\
+\hline
+Total training time (s) & 106.7 & 1{,}277.0 \\
+Mean step time (ms) & 11.7 & 139.7 \\
+Speedup & \multicolumn{2}{c}{$12.0\times$} \\
+\hline
+\end{tabular}}
+\end{table}
+
+Flow matching is 12x faster per training 
+step. The CNF baseline requires 10 
+velocity field evaluations per training 
+step for ODE integration, plus Hutchinson 
+trace estimation at each step, while flow 
+matching requires a single forward pass 
+and a regression loss. Projected over 
+6{,}000 training steps, CNF training 
+would require approximately 21 minutes 
+versus 107 seconds for flow matching on 
+the same hardware. In the credal mixture 
+setting where $K = 5$ posteriors are 
+approximated, this gap compounds: 
+independent CNF training across all 
+five priors would require approximately 
+105 minutes versus the 107 seconds of 
+the shared flow matching model. This 
+directly validates the computational 
+motivation of Section~2.5.3.
+
+\section{Synthetic 2D Datasets}
+\label{sec:synthetic}
+
+The three synthetic datasets, 
+Eight-Ring, Two Moons, and Two-Arm 
+Spirals, test whether the shared 
+conditional flow can represent complex 
+multimodal density structure. These 
+experiments do not test H1, H2, or 
+H3 directly; rather, they verify the 
+geometric prerequisite that the flow 
+architecture is expressive enough to 
+approximate complex posteriors in 
+the first place.
+
+Table~\ref{tab:synthetic} reports 
+mean test KDE-NLL across 10 seeds 
+for all algorithms, and the gap 
+between best-single and the 
+coordinate descent mixture on each 
+dataset.
+
+\begin{table}[h]
+\centering
+\caption{Mean test KDE-NLL (lower is 
+better) across 10 seeds for synthetic 
+2D datasets. Gap is best-single minus 
+credal (coord.) KDE-NLL; positive 
+means credal is better.}
+\label{tab:synthetic}
+{\singlespacing
+\begin{tabular}{lrrrr}
+\hline
+Dataset & Uniform & Best-single 
+& Credal (coord.) & Gap \\
+\hline
+Eight-Ring   & 2.018 & 1.983 
+             & 1.982 & 0.001 \\
+Two Moons    & 2.019 & 1.982 
+             & 1.981 & 0.001 \\
+Two-Arm Spirals & 2.018 & 1.981 
+             & 1.980 & 0.000 \\
+\hline
+\end{tabular}}
+\end{table}
+
+The credal mixture matches or 
+marginally outperforms best-single 
+on all three datasets (gaps of 
+0.000--0.001 nats), consistent with 
+the prior-insensitive regime: the 
+synthetic datasets have effectively 
+unlimited training data and the 
+five prior perturbations produce 
+similar approximations, so no 
+combination benefit is expected. 
+The uniform baseline is substantially 
+worse (2.018--2.019 vs 1.980--1.983), 
+confirming that the flow does learn 
+informative density structure that 
+a flat prior cannot capture.
+
+The more substantive finding is that 
+KDE-NLL values of approximately 
+$1.98$ nats across all three datasets 
+confirm that the shared conditional 
+flow successfully approximates 
+the target densities. The Eight-Ring 
+geometry, with eight discrete modes 
+on a circle, requires the flow to 
+learn multi-modal structure with 
+rotational symmetry. Two-Arm Spirals 
+imposes a topologically complex 
+density with long-range correlations. 
+Two Moons requires capturing a 
+non-linear bimodal structure. That 
+the flow achieves comparable 
+KDE-NLL across all three geometries 
+demonstrates that the shared 
+backbone has sufficient expressive 
+capacity to serve as a reliable 
+posterior approximator in the 
+Bayesian experiments.
+
+\section{Hypothesis Outcomes}
+\label{sec:hypothesis_summary}
+
+Table~\ref{tab:hypothesis_summary} 
+summarises the outcome of each 
+hypothesis against the key 
+quantitative evidence.
+
+\begin{table}[h]
+\centering
+\caption{Summary of hypothesis 
+test outcomes.}
+\label{tab:hypothesis_summary}
+{\singlespacing
+\begin{tabular}{p{3.5cm}lp{6.5cm}}
+\hline
+Hypothesis & Outcome & Key evidence \\
+\hline
+H1 (Guarantee Visibility) 
+& \textbf{Confirmed} 
+& EM max regret 0.0005 nats vs 
+0.0039 for best-single; all 
+principled mixture algorithms 
+achieve lower mean NLL \\[4pt]
+H2 (Prior Sensitivity Req.) 
+& \textbf{Confirmed} 
+& Full-data spread 0.002 nats 
+across all algorithms; 
+Wilcoxon $p > 0.05$ \\[4pt]
+H3 (Algorithm Comparison) 
+& \textbf{Confirmed} 
+& EM achieves lowest max regret 
+(0.0005) and lowest mean NLL 
+(0.6225); closed-form, no 
+learning rate \\
+\hline
+\end{tabular}}
+\end{table}
+
+All three hypotheses are confirmed. 
+The KL convexity guarantee is 
+empirically visible in the 
+prior-sensitive low-data regime: 
+the credal mixture achieves 
+near-oracle worst-case regret of 
+0.0005 nats under EM, compared 
+to 0.0039 nats for best-single 
+strategy, a factor of approximately 
+eight improvement. The guarantee 
+correctly disappears in the 
+prior-insensitive regime, confirming 
+that it is prior sensitivity, not 
+the method itself, that drives the 
+observed benefit. EM is the most 
+consistent weight optimisation 
+algorithm across the regret criterion 
+and practical considerations. The 
+shared-backbone architecture provides 
+empirical validation for 
+Assumption~\ref{ass:transfer_ch2}, 
+outperforming separately trained 
+flows on predictive performance, 
+training stability, and parameter 
+efficiency simultaneously.

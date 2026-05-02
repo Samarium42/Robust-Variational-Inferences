@@ -1,0 +1,470 @@
+\chapter{Literature Review and Theory}
+\label{chap:literature_review_and_theory}
+\section{Bayesian Inference}
+
+Bayesian inference provides a rational framework for reasoning under uncertainty, grounded in the principle that a rational agent should update their beliefs in accordance with Bayes' rule upon observing new evidence \citep{bernardo1994}. In this section we formally introduce the posterior distribution and the marginal likelihood, and discuss the computational intractability that motivates the approximate inference methods developed in subsequent sections.
+    \subsection{Probability Notation and Conventions}
+
+    We work within the standard measure-theoretic framework of probability theory. A probability space is $(\Omega, \mathcal{F}, \mathbb{P})$ where $\Omega$ is a sample space, $\mathcal{F}$ is a $\sigma$-algebra of measurable events, and $\mathbb{P} : \mathcal{F} \to [0,1]$ is a probability measure satisfying $\mathbb{P}(\Omega) = 1$. A random variable $X : \Omega \to \mathcal{X}$ has distribution $P = \mathbb{P} \circ X^{-1}$; when $P$ is absolutely continuous with respect to a reference measure $\mu$ we write its density as $p = dP/d\mu$ and work with densities throughout, suppressing explicit reference to $\mu$ where context is clear.
+
+    Probability density functions and probability mass functions are both denoted $p(\cdot)$, with the distinction determined by context. We use the terms \textit{distribution} and \textit{density} interchangeably. Conditional densities are written $p(\cdot \mid \cdot)$ following the convention of Gelman et al.\ \citet{gelman2013}. As an exception to the general $p(\cdot)$ convention, we reserve $\pi(\theta)$ specifically for prior distributions over parameters. This distinction becomes important in later sections where multiple priors $\pi_1, \ldots, \pi_K$ are considered simultaneously. The following symbols are used consistently throughout this thesis.
+    {\singlespacing
+    \begin{itemize}
+        \item $(\Omega, \mathcal{F}, \mathbb{P})$: underlying probability space.
+        \item $\theta \in \Theta$: model parameters on the parameter space $\Theta$.
+        \item $x \in \mathcal{X}$: observed data on the observation space $\mathcal{X}$.
+        \item $\pi(\theta)$: prior distribution over parameters, reserved exclusively for priors throughout this thesis.
+        \item $\mathcal{L}(x \mid \theta)$: likelihood function.
+        \item $p(\theta \mid x)$: posterior distribution.
+        \item $Z = \int \mathcal{L}(x \mid \theta)\, \pi(\theta)\, d\theta$: normalising constant.
+    \end{itemize}
+    }
+    Further notation is introduced as needed when each concept is formally defined.
+
+    \subsection{The Posterior and Bayes' Rule}
+
+    Let $\theta \in \Theta$ denote the unknown parameters and $x \in \mathcal{X}$ the observed data. The joint distribution factorises as
+    \begin{equation}
+    p(\theta, x) = \mathcal{L}(x \mid \theta)\, \pi(\theta)
+    \end{equation}
+    and conditioning on the observed data yields the posterior:
+    \begin{equation}
+    p(\theta \mid x) = \frac{\mathcal{L}(x \mid \theta)\, \pi(\theta)}{\int_\Theta \mathcal{L}(x \mid \theta)\, \pi(\theta)\, d\theta}
+    \end{equation}
+    The denominator $p(x)$, known as the marginal likelihood or evidence, serves as a normalising constant ensuring the posterior is a valid probability distribution.
+
+    \subsection{Posterior Intractability}
+    
+    The posterior $p(\theta \mid x)$ is the central object of Bayesian inference, yet computing it exactly is intractable for most models of practical interest. The difficulty lies entirely in the normalising constant $Z$. The numerator $\mathcal{L}(x \mid \theta)\, \pi(\theta)$ is straightforward to evaluate pointwise for any given $\theta$, since it requires only evaluating the likelihood and the prior. The denominator, however, requires integrating this product over the entire parameter space:
+    \begin{equation}
+        Z = \int_\Theta \mathcal{L}(x \mid \theta)\, \pi(\theta)\, d\theta
+    \end{equation}
+    This intractability has two important consequences. First, we cannot evaluate the posterior density exactly at any point $\theta$, since doing so requires knowing $Z$. Second, we cannot draw exact samples from the posterior, which would otherwise allow us to approximate posterior expectations via Monte Carlo methods. Both limitations mean that exact Bayesian inference is computationally infeasible in practice, and approximate inference methods are necessary.
+
+    This intractability is particularly consequential in the context of this thesis. When multiple priors $\pi_1, \ldots, \pi_K$ are under consideration, we face not one but $K$ intractable posteriors simultaneously. Each posterior $p(\theta \mid x, \pi_k)$ has its own normalising constant $Z_k$, and the difficulty of computing any one of them is compounded by the need to reason about the entire family. This motivates approximate inference methods that are both scalable and amenable to conditioning on auxiliary information such as the prior index $k$, a requirement that guides the architectural choices developed in subsequent sections.
+
+    Among the available approaches: Laplace approximations \citep{mackay1992}, expectation propagation \citep{minka2001}, integrated nested Laplace approximations \citep{rue2009}, and approximate Bayesian computation \citep{sisson2018} and we focus on variational inference, which recasts posterior inference as an optimisation problem, making it scalable, differentiable, and amenable to conditioning on auxiliary information \citep{blei2017}.
+
+\section{Variational Inference}
+
+The key insight behind variational inference is that we can turn the problem of inference into a problem of optimisation \citep{blei2017}. Instead of computing $p(\theta \mid x)$ exactly, we pick a family of tractable distributions $\mathcal{Q}$ and find the member closest to the true posterior, transforming an intractable integration problem into one we can solve with gradient-based optimisation.
+
+    \subsection{The Variational Objective}
+    Let $q(\theta) \in \mathcal{Q}$ be a tractable approximation to $p(\theta \mid x)$. The standard variational objective minimises the reverse KL divergence:
+    \begin{equation}
+        q^* = \argmin_{q \in \mathcal{Q}}\, \mathrm{KL}(q \| p(\cdot \mid x))
+    \end{equation}
+    Expanding the KL divergence reveals that minimising it requires evaluating $\log p(\theta \mid x) = \log \mathcal{L}(x \mid \theta) + \log \pi(\theta) - \log Z$, which involves the intractable $\log Z$. This motivates the tractable surrogate derived in the following section.
+
+    \begin{remark}
+    The KL divergence $\mathrm{KL}(q \| p)$ is asymmetric: the reverse direction $\mathrm{KL}(q \| p)$, used here, penalises $q$ for placing mass where the posterior has none, while the forward direction $\mathrm{KL}(p \| q)$ would require integrating against the intractable posterior and is not directly usable as a variational objective. However, the forward KL plays a central role in Section~2.4, where it appears in the theoretical guarantees for credal mixture inference.
+    \end{remark}
+
+    \subsection{The Evidence Lower Bound}
+
+    Since $\mathrm{KL}(q \| p)$ cannot be minimised directly due to the intractability of $\log Z$, we derive a tractable surrogate. Starting from the log marginal likelihood and multiplying by $1 = \int q(\theta)\, d\theta$:
+    \begin{align}
+        \log p(x) &= \int q(\theta) \log p(x)\, d\theta \nonumber \\
+        &= \int q(\theta) \log \frac{p(\theta, x)}{p(\theta \mid x)}\, d\theta \nonumber \\
+        &= \int q(\theta) \log \frac{p(\theta, x)}{q(\theta)}\, d\theta + \int q(\theta) \log \frac{q(\theta)}{p(\theta \mid x)}\, d\theta \nonumber \\
+        &= \mathcal{L}(q) + \mathrm{KL}(q \| p)
+    \end{align}
+    where the Evidence Lower Bound (ELBO) is defined as:
+    \begin{equation}
+        \mathcal{L}(q) = \int q(\theta) \log \frac{p(\theta, x)}{q(\theta)}\, d\theta = \mathbb{E}_{q}\left[\log p(\theta, x)\right] - \mathbb{E}_{q}\left[\log q(\theta)\right]
+    \end{equation}
+    Since $\mathrm{KL}(q \| p) \geq 0$ with equality if and only if $q = p(\cdot \mid x)$, it follows that $\log p(x) \geq \mathcal{L}(q)$, explaining the name. Since $\log p(x)$ is constant with respect to $q$, maximising the ELBO is equivalent to minimising the KL divergence:
+    \begin{equation}
+        \argmax_{q \in \mathcal{Q}}\, \mathcal{L}(q) = \argmin_{q \in \mathcal{Q}}\, \mathrm{KL}(q \| p)
+    \end{equation}
+    The ELBO can be further decomposed by writing $p(\theta, x) = \mathcal{L}(x \mid \theta)\, \pi(\theta)$:
+    \begin{equation}
+        \mathcal{L}(q) = \mathbb{E}_{q}\left[\log \mathcal{L}(x \mid \theta)\right] - \mathrm{KL}(q \| \pi)
+    \end{equation}
+    The first term encourages $q$ to place mass on parameter values that explain the data well; the second penalises deviation from the prior, acting as a regulariser. Crucially, this objective depends on the choice of $\pi(\theta)$: different priors produce different optimal approximations $q^*$, connecting directly to the prior sensitivity problem motivating this thesis.
+
+    \subsection{Mean Field Variational Inference}
+
+    The simplest and most widely used variational family is the mean field approximation \citep{opper2001}. In this approach the variational distribution is assumed to factorise fully over the components of $\theta$:
+    \begin{equation}
+        q(\theta) = \prod_{j=1}^D q_j(\theta_j)
+    \end{equation}
+    where each $q_j$ is an independent marginal distribution over the $j$-th component. This factorisation reduces the problem of optimising over a joint distribution on a $D$-dimensional space to optimising over $D$ independent one-dimensional distributions, which is substantially more tractable.
+
+    Under the mean field assumption, the ELBO can be optimised using coordinate ascent variational inference (CAVI), which iteratively updates each factor $q_j$ while holding the others fixed \citep{bishop2006, blei2017}. The optimal update for factor $q_j$ is:
+    \begin{equation}
+        \log q_j^*(\theta_j) = \mathbb{E}_{q_{-j}}\left[\log p(\theta, x)\right] + \text{const}
+    \end{equation}
+    where $\mathbb{E}_{q_{-j}}$ denotes the expectation with respect to all factors except $q_j$. This update has a closed form for models in the exponential family, making mean field VI computationally efficient in those settings \citep{wainwright2008}.
+
+    The independence assumption underlying mean field VI is however a strong one. Posterior distributions over model parameters often exhibit complex dependencies that the factorial approximation cannot represent. In a Bayesian linear regression model, for instance, the posterior over weights and noise variance are typically correlated, and forcing independence causes the mean field approximation to misrepresent the true uncertainty structure. Structured mean field approximations relax this by allowing dependencies within groups of variables while maintaining independence between groups \citep{saul1996}, but remain fundamentally limited by between-group independence assumptions.
+
+    \subsection{Limitations of Standard Variational Families}
+
+    The mean field approximation and its structured variants share a common weakness: the expressiveness of the variational family $\mathcal{Q}$ fundamentally limits the quality of the approximation. No matter how well the ELBO is optimised, if the true posterior lies outside $\mathcal{Q}$, the best approximation within $\mathcal{Q}$ will remain a poor representation of the true uncertainty. This is known as the approximation gap, distinct from the optimisation gap that arises from imperfect ELBO maximisation \citep{turner2011}.
+
+    Beyond expressiveness, standard variational families have a second limitation that is particularly relevant to this thesis. The ELBO depends explicitly on the prior $\pi(\theta)$ through the regularisation term $\mathrm{KL}(q \| \pi)$, meaning different priors produce different optimal approximations even when the likelihood and data are held fixed:
+    \begin{equation}
+        q^*_k = \argmin_{q \in \mathcal{Q}}\, \mathrm{KL}(q \| p(\cdot \mid x, \pi_k)), \quad k = 1, \ldots, K
+    \end{equation}
+    Standard variational inference provides no mechanism for reasoning about this family of approximations jointly. Each prior produces one approximate posterior, and the framework offers no principled way to combine them or to ask what can be concluded robustly across the set. This is precisely the problem of second-order uncertainty identified in Chapter~1, now stated in the language of variational inference.
+
+    Addressing this limitation requires two things. First, a variational family expressive enough to approximate complex posteriors faithfully, so that the approximation gap does not obscure differences between posteriors under different priors. Second, a principled mechanism for combining the $K$ approximate posteriors. The theoretical justification for the second requirement is provided by the KL convexity guarantee of Section~2.4. The first motivates the use of normalising flows and flow matching as the variational family, introduced in Sections~2.5 and~2.6.
+
+\section{Imprecise Probabilities and Credal Sets}
+As established in Section~2.1, Bayesian inference requires a prior $\pi(\theta)$. When multiple priors are equally consistent with prior knowledge, committing to a single one introduces unjustified precision, and the resulting posterior inherits that commitment silently. Imprecise probability theory addresses this by replacing the single prior with a set of distributions, representing the degree of modelling uncertainty explicitly rather than suppressing it.
+
+    \subsection{Motivation: When Precise Priors Are Unjustified}
+
+    \citet{knight1921} drew a fundamental distinction between risk, where outcomes can be assigned precise probabilities, and uncertainty, where the evidence is insufficient to justify any single probability assignment. \citet{kass1989} demonstrate this concretely: in a clinical meta-analysis, three defensible priors applied to the same dataset produce qualitatively different conclusions about treatment effectiveness, with one prior yielding a significant treatment effect and another yielding none. The data does not resolve the disagreement because the posterior remains sensitive to the prior in the limited data regime. \citet{wenzel2020} show the same phenomenon persists in Bayesian neural networks, where prior choice produces differences of several percentage points in predictive accuracy even under large training sets.
+
+    These examples share a common structure: multiple priors are defensible, each produces a materially different posterior, and standard Bayesian inference provides no mechanism for acknowledging or propagating this disagreement.
+
+    \subsection{Lower and Upper Previsions}
+
+    The foundational response is to replace a single distribution with a set $\mathcal{P}$ consistent with the available evidence, working with lower and upper probabilities:
+    \begin{equation}
+        \underline{P}(A) = \inf_{P \in \mathcal{P}} P(A), \qquad \overline{P}(A) = \sup_{P \in \mathcal{P}} P(A)
+    \end{equation}
+    The gap $\overline{P}(A) - \underline{P}(A)$ quantifies irreducible imprecision. The framework generalises to arbitrary bounded functions $f$ via lower and upper previsions \citep{walley1991}:
+    \begin{equation}
+        \underline{P}(f) = \inf_{P \in \mathcal{P}} \mathbb{E}_P[f], \qquad \overline{P}(f) = \sup_{P \in \mathcal{P}} \mathbb{E}_P[f]
+    \end{equation}
+    These reduce to ordinary expectations when $\mathcal{P}$ is a singleton, recovering standard probability theory. The key coherence property is:
+    \begin{equation}
+        \overline{P}(f) = -\underline{P}(-f)
+    \end{equation}
+    A lower prevision satisfying Walley's coherence axioms is called a coherent lower prevision, ensuring the framework does not lead to sure loss.
+
+    \subsection{Credal Sets: Formal Definition and Properties}
+
+    The set of probability distributions $\mathcal{P}$ underlying the lower and upper previsions is called a credal set. We now define this object formally.
+
+    \begin{definition}[Credal Set]
+    A credal set $\mathcal{P}$ is a closed convex set of probability distributions over a measurable space $(\Omega, \mathcal{F})$. Each element $P \in \mathcal{P}$ is a probability distribution consistent with the available evidence and prior knowledge.
+    \end{definition}
+
+    The convexity requirement is natural: if $P_1$ and $P_2$ are both consistent with the available evidence, any mixture $\lambda P_1 + (1-\lambda) P_2$ for $\lambda \in [0,1]$ should also be consistent, since it represents a further hedging between two defensible positions. The closure requirement ensures that the infimum and supremum in the prevision definitions are attained \citep{augustin2014}. A precise distribution is the degenerate case $\mathcal{P} = \{P\}$; a larger credal set corresponds to greater modelling uncertainty.
+
+    Several standard constructions give rise to credal sets in practice. The epsilon-contamination class \citep{berger1984}:
+    \begin{equation}
+        \mathcal{P}_\varepsilon = \left\{ (1-\varepsilon) P_0 + \varepsilon Q : Q \in \mathcal{M} \right\}
+    \end{equation}
+    models the prior as a mixture of a baseline distribution $P_0$ and an arbitrary contaminating distribution $Q$, with $\varepsilon$ controlling the degree of imprecision. This construction is the classical approach to prior robustness and the intellectual precursor to the credal set framework used in this thesis.
+
+    In this thesis we work with a finite credal set of $K$ priors $\Pi = \{ \pi_1, \ldots, \pi_K \}$, each representing a plausible prior that cannot be ruled out given the available knowledge. The convex hull $\mathrm{conv}(\Pi) = \{ \sum_{k=1}^K w_k \pi_k : w \in \Delta_{K-1} \}$ is itself a credal set, and working with the finite generating set $\Pi$ rather than the full convex hull is a common and computationally convenient simplification \citep{cozman2000}.
+
+    Applying Bayes' rule to each element of $\Pi$ induces a set of posteriors $\mathcal{Q}^* = \{ p(\theta \mid x, \pi_k) : k = 1, \ldots, K \}$. Rather than reporting this full set, which is not directly tractable, we form the credal mixture:
+    \begin{equation}
+        q_w(\theta) = \sum_{k=1}^K w_k q^\theta_k(\theta), \quad w \in \Delta_{K-1}
+    \end{equation}
+    where each $q^\theta_k$ is a flow-based approximation to $p(\theta \mid x, \pi_k)$. This is a single tractable distribution that represents the credal set without collapsing it to a point estimate under any single prior. The notation for exact and approximate posteriors is formalised in Definition~\ref{def:exact_approx_posteriors} in Section~2.4, where it is first required.
+
+    \section{The KL Convexity Guarantee}
+
+    The credal mixture $q_w = \sum_{k=1}^K w_k q^\theta_k$ is a tractable representation of the credal set, but its theoretical justification requires answering whether combining posteriors under different priors produces a better approximation than simply choosing the best single one. In this section we show that the answer is yes, via a classical property of KL divergence. We first fix notation for the exact and approximate posteriors that appear throughout.
+
+    \begin{definition}[Exact and Approximate Posteriors]
+    \label{def:exact_approx_posteriors}
+    For each prior $\pi_k \in \Pi$, the exact posterior is $q^*_k(\theta) = p(\theta \mid x, \pi_k)$ and the flow-based approximation is $q^\theta_k$, obtained by training the velocity field $v_\theta(z, t, k)$ with the objective of Section~2.6. The approximation error of the $k$-th component is $\varepsilon_k = \mathrm{KL}(q^*_k \| q^\theta_k)$.
+    \end{definition}
+
+    \subsection{Convexity of KL Divergence}
+
+    \begin{lemma}[Convexity of KL in its Second Argument] 
+    \label{lem:kl_convexity_ch2}
+    For any fixed distribution $P$ and any $\lambda \in [0,1]$:
+    \begin{equation}
+        \mathrm{KL}(P \| \lambda Q_1 + (1-\lambda) Q_2) \leq \lambda\, \mathrm{KL}(P \| Q_1) + (1-\lambda)\, \mathrm{KL}(P \| Q_2)
+    \end{equation}
+    \end{lemma}
+
+    \begin{proof}
+    Since $-\log$ is convex, Jensen's inequality gives $-\log(\lambda a + (1-\lambda)b) \leq -\lambda \log a - (1-\lambda) \log b$. Setting $a = q_1(\theta)/p(\theta)$, $b = q_2(\theta)/p(\theta)$, rearranging, multiplying by $p(\theta) \geq 0$, and integrating over $\Theta$ yields the result.
+    \end{proof}
+
+    \begin{remark}
+    Lemma~\ref{lem:kl_convexity_ch2} extends to $K$ components by induction: for any $w \in \Delta_{K-1}$, $\mathrm{KL}(P \| \sum_{k=1}^K w_k Q_k) \leq \sum_{k=1}^K w_k\, \mathrm{KL}(P \| Q_k)$.
+    \end{remark}
+
+    \subsection{The Mixture Lower Bound}
+
+    \begin{theorem}[Exact Mixture Lower Bound]
+    \label{thm:exact_mixture_ch2}
+    Let $p(\theta \mid x)$ be the true posterior and $q_1, \ldots, q_K$ any $K$ distributions on $\Theta$. Then:
+    \begin{equation}
+        \inf_{w \in \Delta_{K-1}} \mathrm{KL}(p(\theta \mid x) \| q_w) \leq \min_{k \in \{1,\ldots,K\}} \mathrm{KL}(p(\theta \mid x) \| q_k)
+    \end{equation}
+    \end{theorem}
+
+    \begin{proof}
+    Let $k^* \in \argmin_k\, \mathrm{KL}(p(\theta \mid x) \| q_k)$ and define $e_{k^*} \in \Delta_{K-1}$ with $(e_{k^*})_k = \mathbf{1}[k = k^*]$. Since $e_{k^*}$ is feasible:
+    \begin{equation}
+        \inf_{w \in \Delta_{K-1}} \mathrm{KL}(p(\theta \mid x) \| q_w) \leq \mathrm{KL}(p(\theta \mid x) \| q_{e_{k^*}}) = \min_k\, \mathrm{KL}(p(\theta \mid x) \| q_k)
+    \end{equation}
+    \end{proof}
+
+    \subsection{Implications for Credal Mixture Inference}
+
+    Theorem~\ref{thm:exact_mixture_ch2} establishes that the optimal mixture over the credal set performs at least as well as the best single component under KL divergence from the true posterior. Three implications follow directly for the credal mixture framework developed in this thesis.
+
+    First, it provides theoretical justification for combining posteriors across the credal set rather than selecting one. No matter how good the best single posterior is, the optimal mixture is at least as good. The combination can only help, never hurt, in the exact setting.
+
+    Second, it establishes that the simplex $\Delta_{K-1}$ is the right domain for the weight optimisation problem. The degenerate weight vectors at the vertices of the simplex correspond to the single-component posteriors, and the interior of the simplex corresponds to genuine mixtures. The theorem guarantees that the optimum lies somewhere in the simplex and is at least as good as any vertex.
+
+    Third, and most importantly for this thesis, the result motivates the choice of held-out negative log-likelihood as the weight selection objective. Since the theorem is stated in terms of KL divergence from the true posterior, and minimising KL divergence from the true data generating distribution is equivalent to maximising the expected log likelihood, the held-out NLL is the natural empirical proxy for the theoretical objective. This connection is formalised in Section~2.7.
+
+    \begin{remark}
+    Theorem~\ref{thm:exact_mixture_ch2} is stated for exact posteriors. In practice, the posteriors $q_k$ are flow-based approximations $q^\theta_k$ and the weights are estimated from finite held-out data. Whether the guarantee survives these approximations depends on the quality of the variational family and the weight selection procedure, which is the central empirical question of Chapter~4. The theoretical conditions are established in Section~2.7.
+    \end{remark}
+
+\section{Normalising Flows}
+
+    Normalising flows construct a complex distribution by starting from a simple base distribution and transforming it through learned invertible mappings. This addresses the core limitation of mean field VI: because the transformations are learned rather than fixed, the resulting distributions can represent arbitrary posterior geometry including strong correlations, multiple modes, and heavy tails \citep{papamakarios2021}.
+
+    Even with expressive flows, the credal mixture framework requires training $K$ separate approximations. When trained independently there is no guarantee they are comparable in quality: one prior may lead to a well-behaved posterior that the flow approximates easily, while another may lead to complex geometry that the same architecture struggles with. Mixing approximations of uneven quality does not reliably recover the convexity guarantee. What is needed is a flow family amenable to conditioning on the prior index $k$, so a single model can approximate all $K$ posteriors within a shared training framework. The computational bottleneck that motivates the specific approach used here is described in Section~2.5.3.
+
+   \subsection{Change of Variables and the Flow Framework}
+
+    The key mathematical operation underpinning normalising flows is the change of variables formula. When a random variable is passed through an invertible transformation, its density changes in a predictable way determined by how much the transformation locally stretches or compresses space. Formalising this relationship allows us to construct complex distributions by composing simple, learned transformations, which is precisely what we need for a flexible variational family.
+
+    Let $Z \sim p_Z$ on $\mathbb{R}^D$ and let $f : \mathbb{R}^D \to \mathbb{R}^D$ be differentiable and invertible. The density of $X = f(Z)$ is:
+    \begin{equation}
+        p_X(x) = p_Z(z) \left| \det \frac{\partial f(z)}{\partial z} \right|^{-1}, \quad z = f^{-1}(x)
+        \label{eq:cov}
+    \end{equation}
+    A normalising flow composes $L$ invertible transformations $f_1, \ldots, f_L$ applied to $z_0 \sim p_Z$, giving log density:
+    \begin{equation}
+        \log p_X(x) = \log p_Z(z_0) - \sum_{\ell=1}^L \log \left| \det \frac{\partial f_\ell(z_{\ell-1})}{\partial z_{\ell-1}} \right|
+        \label{eq:flow_density}
+    \end{equation}
+    In the variational inference setting, $p_X$ plays the role of $q(\theta)$ and the flow parameters are optimised to maximise the ELBO using equation~\eqref{eq:flow_density} \citep{rezende2015}. Early architectures such as RealNVP \citep{dinh2017} and Glow \citep{kingma2018} used triangular Jacobians whose determinants cost only $\mathcal{O}(D)$ to compute, enabling practical training.
+
+    \subsection{Continuous Normalising Flows and Neural ODEs}
+
+    The continuous-time limit of discrete flows replaces the finite composition of transformations with a differential equation \citep{chen2018}. Rather than applying $L$ discrete invertible maps, a velocity field $v_\theta : \mathbb{R}^D \times [0,1] \to \mathbb{R}^D$ governs the continuous evolution of particles:
+    \begin{equation}
+        \frac{dz(t)}{dt} = v_\theta(z(t), t), \quad z(0) \sim p_Z
+        \label{eq:ode}
+    \end{equation}
+    The solution $z(1)$, obtained by integrating equation~\eqref{eq:ode} from $t=0$ to $t=1$, defines a sample from the approximate posterior. The log density of a sample evolves via the instantaneous change of variables formula \citep{chen2018}:
+    \begin{equation}
+        \frac{d \log p(z(t))}{dt} = -\mathrm{tr}\left(\frac{\partial v_\theta(z(t), t)}{\partial z(t)}\right)
+        \label{eq:icov}
+    \end{equation}
+    where $\mathrm{tr}(\cdot)$ denotes the matrix trace. This is the continuous analogue of the log Jacobian determinant sum in equation~\eqref{eq:flow_density}, and it follows from the Liouville equation in fluid dynamics, which relates the rate of change of a probability density to the divergence of the velocity field.
+
+    Continuous normalising flows offer two key advantages over discrete flows. First, the architecture of $v_\theta$ is unconstrained: unlike coupling layer architectures which impose specific triangular Jacobian structure, any neural network can serve as $v_\theta$, making CNFs strictly more expressive. Second, the trace in equation~\eqref{eq:icov} costs $\mathcal{O}(D^2)$ exactly and can be approximated in $\mathcal{O}(D)$ using the Hutchinson trace estimator \citep{hutchinson1990, grathwohl2019}, compared to the $\mathcal{O}(D^3)$ determinant required by general discrete flows.
+
+    Despite these advantages, CNFs introduce a new computational challenge. Density evaluation is now coupled to ODE integration: to evaluate $\log p(z(1))$, one must integrate both the ODE and the trace term in equation~\eqref{eq:icov} simultaneously from $t=0$ to $t=1$. This coupling between simulation and density evaluation is absent in discrete flows, where the log Jacobian is computed analytically at each transformation layer. The implications of this coupling for the credal mixture setting, and the computational approach that resolves it, are developed in the following section.
+
+    \subsection{The Log-Determinant Bottleneck}
+
+    Training a CNF requires integrating the ODE in equation~\eqref{eq:ode} numerically at every training step to evaluate the log density via equation~\eqref{eq:icov}. A standard adaptive solver such as Dormand-Prince \citep{dormand1980} requires on the order of hundreds of function evaluations per integration, making training substantially more expensive than discrete flows. In the credal mixture setting where $K$ posteriors must be approximated, this cost multiplies by $K$ under independent training, making the approach increasingly impractical as the credal set grows.
+
+    Even setting aside simulation cost, evaluating the trace in equation~\eqref{eq:icov} requires $\mathcal{O}(D^2)$ computation exactly, or a stochastic $\mathcal{O}(D)$ Hutchinson approximation that introduces variance into the training objective and can destabilise optimisation \citep{grathwohl2019}. Both bottlenecks share a common structure: they arise because density evaluation is coupled to ODE simulation. An approach that trains the velocity field directly without density evaluation or ODE simulation during training would eliminate both simultaneously. The following section introduces exactly such an approach.
+
+\section{Flow Matching}
+    Flow matching reframes the training objective entirely. Rather than asking $v_\theta$ to reproduce the exact log density at each training step, it asks $v_\theta$ to match a known target vector field that generates a desired probability path from source to target. This is a direct regression problem requiring no ODE simulation and no density evaluation during training \citep{lipman2022, albergo2022}.
+
+    The key insight is that while the marginal target vector field is intractable, it can be replaced by a conditional target vector field that conditions on individual data points. The two objectives share the same gradient with respect to $\theta$, so training on the tractable conditional objective is theoretically equivalent to training on the intractable marginal one \citep{lipman2022}.
+
+    Beyond training efficiency, the velocity field $v_\theta(z, t)$ can be extended to $v_\theta(z, t, k)$ by conditioning on a discrete prior index $k$ at minimal additional cost. A single shared model then approximates all $K$ posteriors simultaneously, directly addressing the architectural failure mode of independent training and satisfying the uniform approximation error condition of Assumption~\ref{ass:transfer_ch2}.
+
+    \subsection{Probability Paths and Vector Fields}
+
+    \begin{definition}[Probability Path]
+    \label{def:prob_path}
+    A probability path is a family $\{p_t\}_{t \in [0,1]}$ satisfying $p_0 = p_Z$ and $p_1 \approx p_\text{target}$.
+    \end{definition}
+
+    A velocity field $v$ and path $\{p_t\}$ are compatible if $v$ generates $\{p_t\}$, i.e., integrating the ODE from $z(0) \sim p_0$ produces $z(t) \sim p_t$ for all $t$. The condition for compatibility is the continuity equation:
+    \begin{equation}
+        \frac{\partial p_t(z)}{\partial t} = -\nabla \cdot (p_t(z)\, v(z, t))
+        \label{eq:continuity_fm}
+    \end{equation}
+    The velocity field generating a given path is not unique, but all compatible fields produce the same marginal distributions and the same samples at $t=1$.
+
+    \subsection{The Conditional Flow Matching Objective}
+
+    The natural training objective is the flow matching loss:
+    \begin{equation}
+        \mathcal{L}_\text{FM}(\theta) = \mathbb{E}_{t \sim \mathcal{U}[0,1],\, z \sim p_t} \left\| v_\theta(z, t) - u_t(z) \right\|^2
+        \label{eq:fm_obj}
+    \end{equation}
+    where $u_t(z)$ is the marginal vector field generating $p_t$. This is intractable because $u_t(z)$ requires integrating over all target points. The resolution is to condition on individual samples $z_1 \sim p_1$ and define conditional paths $p_t(z \mid z_1) = \mathcal{N}(z \mid \mu_t(z_1), \sigma_t(z_1)^2 I)$ with boundary conditions matching $p_0$ at $t=0$ and concentrating at $z_1$ at $t=1$. The conditional vector field $u_t(z \mid z_1)$ generating this path is available in closed form, giving the conditional flow matching objective:
+    \begin{equation}
+        \mathcal{L}_\text{CFM}(\theta) = \mathbb{E}_{t,\, z_1 \sim p_1,\, z \sim p_t(\cdot \mid z_1)} \left\| v_\theta(z, t) - u_t(z \mid z_1) \right\|^2
+        \label{eq:cfm_obj}
+    \end{equation}
+
+    \begin{theorem}[Equivalence of Flow Matching Objectives \citep{lipman2022}]
+    \label{thm:fm_equivalence}
+    $\nabla_\theta\, \mathcal{L}_\text{FM}(\theta) = \nabla_\theta\, \mathcal{L}_\text{CFM}(\theta)$.
+    \end{theorem}
+
+    \begin{proof}
+    Expanding $\mathcal{L}_\text{FM}$ and writing $p_t(z) = \mathbb{E}_{z_1}[p_t(z \mid z_1)]$:
+    \begin{equation}
+        \mathcal{L}_\text{FM}(\theta) = \mathbb{E}_{t, z \sim p_t} \|v_\theta\|^2 - 2\,\mathbb{E}_{t, z \sim p_t}\left[v_\theta^\top u_t(z)\right] + C
+    \end{equation}
+    The cross term equals $\mathbb{E}_{t, z_1, z \sim p_t(\cdot|z_1)}[v_\theta^\top u_t(z \mid z_1)]$ by the law of total expectation, as does the first term. Combining gives $\mathcal{L}_\text{FM}(\theta) = \mathcal{L}_\text{CFM}(\theta) + C'$ where $C'$ is constant in $\theta$.
+    \end{proof}
+
+    Theorem~\ref{thm:fm_equivalence} makes flow matching practical: the conditional objective, which requires no ODE simulation, produces the same velocity field as the intractable marginal objective.
+
+    \subsection{Simulation-Free Training}
+
+    Theorem~\ref{thm:fm_equivalence} establishes that the conditional flow matching objective is equivalent to the marginal objective for optimisation purposes. What remains is to specify a concrete probability path and show that the resulting training procedure requires no ODE integration at any point during training.
+
+    The simplest and most effective choice is the linear interpolant path, also called the optimal transport path \citep{lipman2022;liu2022}. For a target sample $z_1 \sim p_1$ and a base sample $z_0 \sim p_Z$, define:
+    \begin{equation}
+        z_t = (1 - t) z_0 + t z_1, \quad t \in [0, 1]
+        \label{eq:linear_interp}
+    \end{equation}
+    This is simply a straight line in $\mathbb{R}^D$ connecting $z_0$ to $z_1$. The conditional vector field that generates this path is obtained by differentiating with respect to $t$:
+    \begin{equation}
+        u_t(z \mid z_1) = \frac{d z_t}{dt} = z_1 - z_0
+    \end{equation}
+    This is a constant vector field pointing directly from $z_0$ to $z_1$, available in closed form with no approximation required. Substituting into the conditional flow matching objective gives the concrete training objective used in this thesis:
+    \begin{equation}
+        \mathcal{L}_\text{CFM}(\theta) = \mathbb{E}_{t \sim \mathcal{U}[0,1],\, z_0 \sim p_Z,\, z_1 \sim p_1} \left\| v_\theta(z_t, t) - (z_1 - z_0) \right\|^2
+        \label{eq:cfm_linear}
+    \end{equation}
+    where $z_t = (1-t)z_0 + t z_1$ is computed on the fly. Each training step requires only: sampling $t$, $z_0$, $z_1$; computing $z_t$; evaluating $v_\theta(z_t, t)$; and computing the squared error against the constant target $z_1 - z_0$. No ODE solver is called at any point during training.
+
+    The linear interpolant path has an additional practical advantage. Because the target vector field is constant along each trajectory, the learned velocity field tends to produce nearly straight flow trajectories after training. Straight trajectories are easier to integrate accurately at inference time, requiring fewer ODE solver steps than CNFs trained by the original maximum likelihood approach where trajectories are curved \citep{liu2022}. The training procedure described here applies to a single target distribution. The following section extends it to the credal mixture setting.
+
+    \subsection{Conditioning on Auxiliary Information}
+
+    The simulation-free training procedure of the previous section trains $v_\theta(z, t)$ to approximate a single target distribution. In the credal mixture framework we require $K$ separate approximate posteriors $q^\theta_1, \ldots, q^\theta_K$, one for each prior $\pi_k$. A naive approach would train $K$ independent flow matching models. As discussed in Section~2.5, this produces approximations of potentially uneven quality and does not satisfy the uniform approximation error condition required for Assumption~\ref{ass:transfer_ch2}.
+
+    The solution is to condition the velocity field on the prior index $k$ directly. We extend:
+    \begin{equation}
+        v_\theta : \mathbb{R}^D \times [0,1] \times \{1, \ldots, K\} \to \mathbb{R}^D
+    \end{equation}
+    written as $v_\theta(z, t, k)$. The conditioning is implemented by associating each prior index with a learned embedding vector $e_k \in \mathbb{R}^d$ and concatenating it with the time embedding before passing to the network:
+    \begin{equation}
+        \tilde{t}_k = [\psi(t) \,\|\, e_k] \in \mathbb{R}^{2d}
+        \label{eq:prior_embed}
+    \end{equation}
+    where $\psi : \mathbb{R} \to \mathbb{R}^d$ is a sinusoidal time embedding function. The embedding vectors $e_1, \ldots, e_K$ are learned jointly with the network parameters $\theta$ during training, adding only $K \times d$ parameters to the model, negligible compared to the total parameter count of the velocity field network.
+
+    The conditional flow matching objective extends naturally to the multi-prior setting. For each training step, a prior index $k \sim \mathcal{U}\{1, \ldots, K\}$ is sampled alongside the time and endpoint samples, and the target posterior $p_1 = p(\theta \mid x, \pi_k)$ is used to draw $z_1$:
+    \begin{equation}
+        \mathcal{L}_\text{CFM}(\theta) = \mathbb{E}_{k,\, t,\, z_0,\, z_1 \sim p(\cdot \mid x, \pi_k)} \left\| v_\theta(z_t, t, k) - (z_1 - z_0) \right\|^2
+        \label{eq:cfm_conditioned}
+    \end{equation}
+    The velocity field backbone is shared across all $K$ components; only the prior embedding $e_k$ differentiates behaviour under each prior. All $K$ approximate posteriors are therefore trained within a common optimisation framework with identical network capacity, directly satisfying the uniformity condition of Assumption~\ref{ass:transfer_ch2}.
+
+    This shared training framework has an important consequence for the credal mixture guarantee. Because all components share the same backbone, differences in approximation quality across priors arise only from genuine differences in posterior complexity rather than from differences in model capacity or training dynamics. The uniform approximation error bound $\varepsilon_k \leq \varepsilon$ of Assumption~\ref{ass:transfer_ch2} is therefore a reasonable assumption under this architecture in a way that it would not be under independent training. The full pipeline is now in place: a single flow matching model with prior conditioning produces $K$ approximate posteriors, and mixture weights are selected by minimising held-out NLL on $\mathcal{X}$. The theoretical properties of the resulting credal mixture are characterised by Theorem~\ref{thm:approx_mixture_ch2} in the following section.
+
+\section{The KL Convexity Guarantee Under Flow Approximation}
+The preceding sections have established the theoretical foundation for credal mixture inference and the computational machinery for realising it. We now ask whether the exact guarantee of Theorem~\ref{thm:exact_mixture_ch2} survives when posteriors are approximated by flow matching models and weights are selected from finite held-out data.
+
+    \subsection{From Exact to Approximate Posteriors}
+
+    Three things change in practice relative to Theorem~\ref{thm:exact_mixture_ch2}. First, each posterior is replaced by a flow-based approximation $q^\theta_k$. Second, mixture weights are selected by minimising held-out NLL on observations $x_1, \ldots, x_N \in \mathcal{X}$. Third, the theoretical objects of interest become predictive densities on $\mathcal{X}$ rather than posteriors on $\Theta$.
+
+    \begin{definition}[Predictive Densities]
+    \label{def:priors_posteriors_predictive}
+    The predictive density under $q^*_k$ is $m_k(x) = \int \mathcal{L}(x \mid \theta)\, q^*_k(\theta)\, d\theta$; under $q^\theta_k$ it is $m^\theta_k(x) = \int \mathcal{L}(x \mid \theta)\, q^\theta_k(\theta)\, d\theta$; the mixture predictive is $m^\theta_w(x) = \sum_{k=1}^K w_k\, m^\theta_k(x)$.
+    \end{definition}
+
+    The held-out NLL objective is $\hat{R}_N(w) = -\frac{1}{N} \sum_{i=1}^N \log m^\theta_w(x_i)$ with empirical minimiser $\hat{w}^N = \argmin_{w} \hat{R}_N(w)$.
+
+    Two assumptions are required.
+
+    \begin{assumption}[Uniform Empirical Risk Control]
+    \label{ass:gc_ch2}
+    The class $\{-\log m^\theta_w : w \in \Delta_{K-1}\}$ is Glivenko-Cantelli under $P$:
+    \begin{equation}
+        \sup_{w \in \Delta_{K-1}} \left| \hat{R}_N(w) - R(w) \right| \xrightarrow{\mathrm{a.s.}} 0 \quad \text{as } N \to \infty
+    \end{equation}
+    where $R(w) = \mathrm{KL}(P \| m^\theta_w) + c(P)$ and $c(P)$ does not depend on $w$.
+    \end{assumption}
+
+    \begin{assumption}[Uniform Transfer Control]
+    \label{ass:transfer_ch2}
+    There exists $\eta \geq 0$ such that for all $k$:
+    \begin{equation}
+        \mathrm{KL}(P \| m^\theta_k) \leq \mathrm{KL}(P \| m_k) + \eta
+    \end{equation}
+    The shared-backbone architecture of Section~2.6 is designed to satisfy this by ensuring all $K$ components are trained with comparable capacity.
+    \end{assumption}
+
+    \begin{lemma}[Empirical Minimiser Excess Risk]
+    \label{lem:excess_risk_ch2}
+    Under Assumption~\ref{ass:gc_ch2}, the empirical minimiser $\hat{w}^N$ satisfies:
+    \begin{equation}
+        \mathrm{KL}(P \| m^\theta_{\hat{w}^N}) \leq \inf_{w \in \Delta_{K-1}} \mathrm{KL}(P \| m^\theta_w) + \delta_N
+    \end{equation}
+    where $\delta_N = 2\sup_{w \in \Delta_{K-1}} |\hat{R}_N(w) - R(w)| \xrightarrow{\mathrm{a.s.}} 0$ as $N \to \infty$.
+    \end{lemma}
+
+    \begin{proof}
+    Since $\hat{w}^N$ minimises $\hat{R}_N$ over $\Delta_{K-1}$, for every $w \in \Delta_{K-1}$ we have $\hat{R}_N(\hat{w}^N) \leq \hat{R}_N(w)$. Using the uniform convergence bound:
+    \begin{align}
+        R(\hat{w}^N) &\leq \hat{R}_N(\hat{w}^N) + \sup_{u \in \Delta_{K-1}} |\hat{R}_N(u) - R(u)| \nonumber \\
+        &\leq \hat{R}_N(w) + \sup_{u} |\hat{R}_N(u) - R(u)| \nonumber \\
+        &\leq R(w) + 2\sup_{u} |\hat{R}_N(u) - R(u)|
+    \end{align}
+    Taking the infimum over $w$ on the right and substituting $R(w) = \mathrm{KL}(P \| m^\theta_w) + c(P)$ with $c(P)$ constant in $w$ yields the result. That $\delta_N \to 0$ almost surely follows directly from Assumption~\ref{ass:gc_ch2}.
+    \end{proof}
+
+    \subsection{The Approximate Mixture Bound}
+
+    \begin{theorem}[Approximate Mixture Bound]
+    \label{thm:approx_mixture_ch2}
+    Under Assumptions~\ref{ass:gc_ch2} and~\ref{ass:transfer_ch2}:
+    \begin{equation}
+        \mathrm{KL}(P \| m^\theta_{\hat{w}^N}) \leq \min_k\, \mathrm{KL}(P \| m_k) + \eta + \delta_N
+    \end{equation}
+    where $\delta_N \xrightarrow{\mathrm{a.s.}} 0$ as $N \to \infty$.
+    \end{theorem}
+
+    \begin{proof}
+    The proof chains three inequalities. First, apply Lemma~\ref{lem:excess_risk_ch2}:
+    \begin{equation}
+        \mathrm{KL}(P \| m^\theta_{\hat{w}^N}) \leq \inf_{w \in \Delta_{K-1}} \mathrm{KL}(P \| m^\theta_w) + \delta_N
+    \end{equation}
+    Second, apply Theorem~\ref{thm:exact_mixture_ch2} to the approximate family $\{m^\theta_k\}$:
+    \begin{equation}
+        \inf_{w \in \Delta_{K-1}} \mathrm{KL}(P \| m^\theta_w) \leq \min_{k=1}^K\, \mathrm{KL}(P \| m^\theta_k)
+    \end{equation}
+    Third, apply Assumption~\ref{ass:transfer_ch2} to each component:
+    \begin{equation}
+        \min_{k=1}^K\, \mathrm{KL}(P \| m^\theta_k) \leq \min_{k=1}^K\, \left[\mathrm{KL}(P \| m_k) + \eta\right] = \min_{k=1}^K\, \mathrm{KL}(P \| m_k) + \eta
+    \end{equation}
+    Combining the three displays yields the result.
+    \end{proof}
+
+    \begin{corollary}[Recovery of Exact Guarantee]
+    \label{cor:recovery_ch2}
+    As $\eta \to 0$ and $N \to \infty$: $\mathrm{KL}(P \| m^\theta_{\hat{w}^N}) \to \min_k\, \mathrm{KL}(P \| m_k)$.
+    \end{corollary}
+
+    \begin{proposition}[Sufficient Condition for Transfer Control]
+    \label{prop:sqrt_eps_ch2}
+    If $\varepsilon_k \leq \varepsilon$ for all $k$, $dP/dq^*_k \leq \Gamma$ $q^*_k$-a.e., and $|\log(q^*_k/q^\theta_k)| \leq M$ uniformly, then Assumption~\ref{ass:transfer_ch2} holds with $\eta = \Gamma C_M \sqrt{2\varepsilon}$ where $C_M = \sup_{r \in [e^{-M}, e^M]} r|\log r|/|r-1|$.
+    \end{proposition}
+
+    \begin{proof}
+    Fix $k$ and write $b = q^*_k$, $c = q^\theta_k$ for brevity. Observe that:
+    \begin{equation}
+        \mathrm{KL}(P \| c) - \mathrm{KL}(P \| b) = \int \log \frac{b(\theta)}{c(\theta)}\, dP(\theta)
+    \end{equation}
+    Condition (2) gives $dP \leq \Gamma\, dq^*_k = \Gamma\, b\, d\theta$, so:
+    \begin{equation}
+        \left|\mathrm{KL}(P \| c) - \mathrm{KL}(P \| b)\right| \leq \Gamma \int \left|\log \frac{b(\theta)}{c(\theta)}\right| b(\theta)\, d\theta
+    \end{equation}
+    Setting $r(\theta) = b(\theta)/c(\theta)$, condition (3) gives $r \in [e^{-M}, e^M]$ pointwise, so $r|\log r| \leq C_M|r-1|$. Therefore:
+    \begin{equation}
+        \int \left|\log \frac{b}{c}\right| b\, d\theta = \int r|\log r|\, c\, d\theta \leq C_M \int |b - c|\, d\theta = 2C_M \|b - c\|_\mathrm{TV}
+    \end{equation}
+    Pinsker's inequality and condition (1) give $\|b - c\|_\mathrm{TV} \leq \sqrt{\varepsilon_k / 2} \leq \sqrt{\varepsilon / 2}$. Combining:
+    \begin{equation}
+        \mathrm{KL}(P \| m^\theta_k) \leq \mathrm{KL}(P \| m_k) + \Gamma C_M \sqrt{2\varepsilon}
+    \end{equation}
+    for all $k$, so Assumption~\ref{ass:transfer_ch2} holds with $\eta = \Gamma C_M \sqrt{2\varepsilon}$.
+    \end{proof}

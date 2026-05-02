@@ -1,0 +1,12 @@
+usage: train_cnf_baseline.py [-h] [--steps STEPS] [--batch BATCH] [--lr LR]
+                             [--hidden HIDDEN] [--depth DEPTH] [--seed SEED]
+                             [--max_train MAX_TRAIN] [--data_dir DATA_DIR]
+                             [--outdir OUTDIR] [--priors PRIORS]
+                             [--problem {german_credit,breast_cancer}]
+                             [--n_timing_trials N_TIMING_TRIALS]
+                             [--cnf_steps CNF_STEPS]
+                             [--hmc_samples HMC_SAMPLES]
+                             [--hmc_warmup HMC_WARMUP]
+                             [--hmc_step_size HMC_STEP_SIZE]
+                             [--hmc_leapfrog HMC_LEAPFROG]
+train_cnf_baseline.py: error: unrecognized arguments: --mode fm

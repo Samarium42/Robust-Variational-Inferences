@@ -1,0 +1,99 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  every node/.style = {font=\small},
+  inbox/.style  = {rectangle, rounded corners=5pt,
+                   draw=orange!80!black, fill=orange!10,
+                   text width=3.0cm, minimum height=1.6cm,
+                   align=center},
+  stepbox/.style = {rectangle, rounded corners=5pt,
+                    draw=#1!80!black, fill=#1!10,
+                    text width=6.0cm, minimum height=1.6cm,
+                    align=center},
+  outbox/.style  = {rectangle, rounded corners=5pt,
+                    draw=violet!80!black, fill=violet!10,
+                    text width=6.0cm, minimum height=1.6cm,
+                    align=center},
+  arr/.style = {-{Stealth[length=5pt]}, thick, gray!60!black},
+]
+
+%% ── Inputs ────────────────────────────────────────────────────────────────
+\node[inbox] at (-2.2, 0) (samples) {
+  Flow samples\\[2pt]
+  $\{\theta_k^{(s)}\}_{s=1}^S$\\
+  $K$ components
+};
+\node[inbox] at (2.2, 0) (val) {
+  Validation data\\[2pt]
+  $\{x_i\}_{i=1}^{N_\mathrm{val}}$
+};
+
+%% ── Step 1 ────────────────────────────────────────────────────────────────
+\node[stepbox=blue] at (0, -2.4) (logmat) {
+  \textbf{Precompute log-density matrix}\\[4pt]
+  $L_{ik} = \log m_k^\theta(x_i)
+  = \log \tfrac{1}{S}\!\sum_s p(x_i \mid \theta_k^{(s)})$\\[2pt]
+  shape:\ $N_\mathrm{val} \times K$
+};
+
+%% ── Step 2 ────────────────────────────────────────────────────────────────
+\node[stepbox=orange] at (0, -4.6) (init) {
+  \textbf{Initialise weights}\\[4pt]
+  $w_k^{(0)} = 1/K \qquad \forall\, k$
+};
+
+%% ── Step 3 ────────────────────────────────────────────────────────────────
+\node[stepbox=teal] at (0, -6.9) (estep) {
+  \textbf{E-step:\ compute responsibilities}\\[4pt]
+  $r_{ik} = \dfrac{w_k \exp(L_{ik})}
+            {\displaystyle\sum_j w_j \exp(L_{ij})}$
+};
+
+%% ── Step 4 ────────────────────────────────────────────────────────────────
+\node[stepbox=teal] at (0, -9.3) (mstep) {
+  \textbf{M-step:\ update weights}\\[4pt]
+  $w_k^{(t+1)} = \dfrac{1}{N}
+  \displaystyle\sum_{i=1}^N r_{ik}$
+};
+
+%% ── Step 5 ────────────────────────────────────────────────────────────────
+\node[stepbox=red] at (0, -11.6) (conv) {
+  \textbf{Converged?}\\[4pt]
+  $\|w^{(t+1)} - w^{(t)}\| < 10^{-10}$
+  \quad or \quad max 200 iterations
+};
+
+%% ── Output ────────────────────────────────────────────────────────────────
+\node[outbox] at (0, -13.8) (output) {
+  \textbf{Optimal weights}
+  $\hat{w} \in \Delta_{K-1}$\\[4pt]
+  Credal mixture:\
+  $q_{\hat{w}} = \sum_k \hat{w}_k\, q_k^\theta$
+};
+
+%% ── Main arrows ──────────────────────────────────────────────────────────
+\draw[arr] (samples.south) -- ++(0,-0.4) -| (logmat.north);
+\draw[arr] (val.south)     -- ++(0,-0.4) -| (logmat.north);
+\draw[arr] (logmat) -- (init);
+\draw[arr] (init)   -- (estep);
+\draw[arr] (estep)  -- (mstep);
+\draw[arr] (mstep)  -- (conv);
+\draw[arr] (conv)   -- node[right, font=\scriptsize\itshape,
+                             gray!60!black] {yes} (output);
+
+%% ── Loop-back: not converged → back to E-step, routed far left ───────────
+\draw[arr, dashed]
+  (conv.west) -- ++(-4.2, 0)
+              -- ++(0,  4.7)
+              -- (estep.west);
+\node[font=\scriptsize\itshape, gray!55!black,
+      align=center, text width=1.6cm]
+  at (-4.8, -9.3) {no:\\repeat};
+
+\end{tikzpicture}
+\caption{Phase 3: EM weight optimisation on $\Delta_{K-1}$.
+         The E-step and M-step alternate until convergence,
+         producing optimal mixture weights $\hat{w}$ that
+         minimise the held-out negative log-likelihood.}
+\label{fig:diagram_em}
+\end{figure}

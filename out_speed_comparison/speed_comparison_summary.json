@@ -1,0 +1,18 @@
+{
+  "fm_mean_step_ms": 11.669492894143332,
+  "fm_median_step_ms": 9.957687492715195,
+  "cnf_mean_step_ms": 139.65040374663658,
+  "cnf_median_step_ms": 137.57968749268912,
+  "speedup_x": 11.967135591360968,
+  "cnf_ode_steps": 10,
+  "timing_batch_size": 64,
+  "fm_total_time_s": 106.70880500000203,
+  "estimated_cnf_total_s": 1276.9987382271215,
+  "fm_nll": {
+    "gaussian": 0.6585534813091288,
+    "gaussian_wide": 0.808665320844873,
+    "cauchy": 0.6954465367000809,
+    "laplace": 0.6369534359290004,
+    "student_t": 0.704960187768264
+  }
+}

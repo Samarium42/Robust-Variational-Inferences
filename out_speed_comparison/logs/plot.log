@@ -1,0 +1,14 @@
+Loading results...
+Traceback (most recent call last):
+  File "/Users/xtricity/Desktop/Robust-Variational-Inferences/plot_speed_comparison.py", line 166, in <module>
+    main()
+  File "/Users/xtricity/Desktop/Robust-Variational-Inferences/plot_speed_comparison.py", line 151, in main
+    summary, fm_times, cnf_times, fm_losses, cnf_losses = load_results(args.outdir)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xtricity/Desktop/Robust-Variational-Inferences/plot_speed_comparison.py", line 27, in load_results
+    cnf_losses = np.load(os.path.join(outdir, "cnf_losses.npy"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xtricity/Desktop/Robust-Variational-Inferences/venv_rob_vi/lib/python3.12/site-packages/numpy/lib/npyio.py", line 427, in load
+    fid = stack.enter_context(open(os_fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'out_speed_comparison/cnf_losses.npy'

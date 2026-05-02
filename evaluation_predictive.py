@@ -1,5 +1,3 @@
-
-
 import argparse
 import csv
 import json
@@ -10,6 +8,7 @@ import numpy as np
 from scipy import stats as scipy_stats
 
 from datasets.german_credit import GermanCreditBLR
+from train_bayesian import make_problem
 
 
 def load_flow_samples(outdir: str, problem_name: str, prior_name: str,
@@ -61,7 +60,7 @@ def predictive_log_lik_mixture(
         # logits: (S, N)
         logits = theta @ X.T
         # log p(y_i | x_i, θ_s)
-        log_p = y[None, :] * logits - np.logaddexp(0, logits)  # (S, N)
+        log_p = -np.logaddexp(0, -y[None, :] * logits)         # (S, N)  log sigmoid(y*logit)
 
         # log mean_s exp(log_p) = logsumexp(log_p, axis=0) - log(S)
         max_lp = log_p.max(axis=0, keepdims=True)
@@ -76,7 +75,7 @@ def predictive_log_lik_mixture(
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--problem", default="german_credit")
+    ap.add_argument("--problem", default="german_credit", choices=["german_credit", "breast_cancer"])
     ap.add_argument("--outdir", default="out_fm_solver")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--hidden", type=int, default=256)
@@ -99,8 +98,8 @@ def main():
     prior_names = [p.strip() for p in args.priors.split(",")]
 
     # Load problem for predictive evaluation
-    problem = GermanCreditBLR(data_dir=args.data_dir, seed=args.seed,
-                              max_train=args.max_train)
+    problem = make_problem(args.problem, data_dir=args.data_dir, seed=args.seed,
+                           max_train=args.max_train)
 
     # Load flow samples for each prior
     sample_arrays = {}

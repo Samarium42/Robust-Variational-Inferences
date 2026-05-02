@@ -15,6 +15,7 @@ from flow_matching.utils import ModelWrapper
 from train_flow import VelocityResNet, ConditionalWrapper, TimeEmbedding, FiLMBlock
 
 from datasets.german_credit import GermanCreditBLR, PRIOR_REGISTRY
+from breast_cancer_blr import BreastCancerBLR          # ← NEW
 
 Device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -26,6 +27,8 @@ Device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def make_problem(name: str, data_dir: str = "data", seed: int = 0, **kwargs):
     if name == "german_credit":
         return GermanCreditBLR(data_dir=data_dir, seed=seed, **kwargs)
+    elif name == "breast_cancer":                       # ← NEW
+        return BreastCancerBLR(data_dir=data_dir, seed=seed, **kwargs)   # ← NEW
     raise ValueError(f"Unknown problem: {name}")
 
 
@@ -180,7 +183,7 @@ def sample_from_model(
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--problem", default="german_credit",
-                    choices=["german_credit"])
+                    choices=["german_credit", "breast_cancer"])   # ← NEW
     ap.add_argument("--priors", default="gaussian,gaussian_wide,cauchy,laplace,student_t",
                     help="Comma-separated priors to train jointly.")
     ap.add_argument("--prior", default="gaussian",

@@ -1,0 +1,268 @@
+\begin{thebibliography}{}
+
+\bibitem[Albergo and Vanden-Eijnden, 2022]{albergo2022}
+Albergo, M.~S. and Vanden-Eijnden, E. (2022).
+\newblock Building normalizing flows with stochastic interpolants.
+\newblock In {\em International Conference on Learning Representations}.
+\newblock arXiv:2209.15571.
+
+\bibitem[Augustin et~al., 2014]{augustin2014}
+Augustin, T., Coolen, F. P.~A., de~Cooman, G., and Troffaes, M. C.~M. (2014).
+\newblock {\em Introduction to Imprecise Probabilities}.
+\newblock Wiley, Chichester.
+
+\bibitem[Azzalini and Bowman, 1990]{azzalini1990}
+Azzalini, A. and Bowman, A.~W. (1990).
+\newblock A look at some data on the old faithful geyser.
+\newblock {\em Applied Statistics}, 39(3):357--365.
+
+\bibitem[Ba et~al., 2016]{ba2016}
+Ba, J.~L., Kiros, J.~R., and Hinton, G.~E. (2016).
+\newblock Layer normalization.
+\newblock {\em arXiv preprint arXiv:1607.06450}.
+
+\bibitem[Beck and Teboulle, 2003]{beck2003}
+Beck, A. and Teboulle, M. (2003).
+\newblock Mirror descent and nonlinear projected subgradient methods for convex optimization.
+\newblock {\em Operations Research Letters}, 31(3):167--175.
+
+\bibitem[Berger, 1984]{berger1984}
+Berger, J.~O. (1984).
+\newblock The robust {Bayesian} viewpoint.
+\newblock In Kadane, J.~B., editor, {\em Robustness of {Bayesian} Analyses}, pages 63--144. North-Holland, Amsterdam.
+
+\bibitem[Berger, 1985]{berger1985}
+Berger, J.~O. (1985).
+\newblock {\em Statistical Decision Theory and {Bayesian} Analysis}.
+\newblock Springer, New York, 2nd edition.
+
+\bibitem[Berger, 1994]{berger1994}
+Berger, J.~O. (1994).
+\newblock An overview of robust {Bayesian} analysis.
+\newblock {\em Test}, 3(1):5--124.
+
+\bibitem[Bernardo and Smith, 1994]{bernardo1994}
+Bernardo, J.~M. and Smith, A. F.~M. (1994).
+\newblock {\em {Bayesian} Theory}.
+\newblock Wiley, Chichester.
+
+\bibitem[Bishop, 2006]{bishop2006}
+Bishop, C.~M. (2006).
+\newblock {\em Pattern Recognition and Machine Learning}.
+\newblock Springer, New York.
+
+\bibitem[Bissiri et~al., 2016]{bissiri2016}
+Bissiri, P.~G., Holmes, C.~C., and Walker, S.~G. (2016).
+\newblock A general framework for updating belief distributions.
+\newblock {\em Journal of the Royal Statistical Society: Series B}, 78(5):1103--1130.
+
+\bibitem[Blei et~al., 2017]{blei2017}
+Blei, D.~M., Kucukelbir, A., and McAuliffe, J.~D. (2017).
+\newblock Variational inference: {A} review for statisticians.
+\newblock {\em Journal of the American Statistical Association}, 112(518):859--877.
+
+\bibitem[Chen et~al., 2018]{chen2018}
+Chen, R. T.~Q., Rubanova, Y., Bettencourt, J., and Duvenaud, D. (2018).
+\newblock Neural ordinary differential equations.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~31.
+
+\bibitem[Cover and Thomas, 2006]{cover2006}
+Cover, T.~M. and Thomas, J.~A. (2006).
+\newblock {\em Elements of Information Theory}.
+\newblock Wiley, Hoboken, NJ, 2nd edition.
+
+\bibitem[Cozman, 2000]{cozman2000}
+Cozman, F.~G. (2000).
+\newblock Credal networks.
+\newblock {\em Artificial Intelligence}, 120(2):199--233.
+
+\bibitem[Dempster et~al., 1977]{dempster1977}
+Dempster, A.~P., Laird, N.~M., and Rubin, D.~B. (1977).
+\newblock Maximum likelihood from incomplete data via the {EM} algorithm.
+\newblock {\em Journal of the Royal Statistical Society: Series B}, 39(1):1--38.
+
+\bibitem[Dinh et~al., 2017]{dinh2017}
+Dinh, L., Sohl-Dickstein, J., and Bengio, S. (2017).
+\newblock Density estimation using real-valued non-volume preserving ({Real NVP}) transformations.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Dormand and Prince, 1980]{dormand1980}
+Dormand, J.~R. and Prince, P.~J. (1980).
+\newblock A family of embedded {Runge--Kutta} formulae.
+\newblock {\em Journal of Computational and Applied Mathematics}, 6(1):19--26.
+
+\bibitem[Duchi et~al., 2008]{duchi2008}
+Duchi, J., Shalev-Shwartz, S., Singer, Y., and Chandra, T. (2008).
+\newblock Efficient projections onto the $\ell_1$-ball for learning in high dimensions.
+\newblock In {\em International Conference on Machine Learning}, pages 272--279.
+
+\bibitem[Fortuin et~al., 2022]{fortuin2021}
+Fortuin, V., Garriga-Alonso, A., Ober, S.~W., Ritter, H., Turner, R.~E., van~der Wilk, M., and Aitchison, L. (2022).
+\newblock {Bayesian} neural network priors revisited.
+\newblock In {\em International Conference on Learning Representations}.
+\newblock arXiv:2102.06571 (2021).
+
+\bibitem[Frank and Wolfe, 1956]{frank1956}
+Frank, M. and Wolfe, P. (1956).
+\newblock An algorithm for quadratic programming.
+\newblock {\em Naval Research Logistics Quarterly}, 3(1--2):95--110.
+
+\bibitem[Futami et~al., 2018]{futami2018}
+Futami, F., Sato, I., and Sugiyama, M. (2018).
+\newblock Variational inference based on robust divergences.
+\newblock In {\em International Conference on Artificial Intelligence and Statistics}, pages 813--822.
+
+\bibitem[Gelman et~al., 2013]{gelman2013}
+Gelman, A., Carlin, J.~B., Stern, H.~S., Dunson, D.~B., Vehtari, A., and Rubin, D.~B. (2013).
+\newblock {\em {Bayesian} Data Analysis}.
+\newblock CRC Press, Boca Raton, FL, 3rd edition.
+
+\bibitem[Gelman and Hill, 2007]{gelman2007}
+Gelman, A. and Hill, J. (2007).
+\newblock {\em Data Analysis Using Regression and Multilevel/{Hierarchical} Models}.
+\newblock Cambridge University Press, Cambridge.
+
+\bibitem[Grathwohl et~al., 2019]{grathwohl2019}
+Grathwohl, W., Chen, R. T.~Q., Bettencourt, J., Sutskever, I., and Duvenaud, D. (2019).
+\newblock {FFJORD}: Free-form continuous dynamics for scalable reversible generative models.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Hoeting et~al., 1999]{hoeting1999}
+Hoeting, J.~A., Madigan, D., Raftery, A.~E., and Volinsky, C.~T. (1999).
+\newblock {Bayesian} model averaging: {A} tutorial.
+\newblock {\em Statistical Science}, 14(4):382--417.
+
+\bibitem[Hofmann, 1994]{hofmann1994}
+Hofmann, H. (1994).
+\newblock Statlog ({German Credit Data}).
+\newblock {UCI} Machine Learning Repository.
+\newblock \url{https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)}.
+
+\bibitem[Hutchinson, 1990]{hutchinson1990}
+Hutchinson, M.~F. (1990).
+\newblock A stochastic estimator of the trace of the influence matrix for {Laplacian} smoothing splines.
+\newblock {\em Communications in Statistics -- Simulation and Computation}, 19(2):433--450.
+
+\bibitem[Kass and Greenhouse, 1989]{kass1989}
+Kass, R.~E. and Greenhouse, J.~B. (1989).
+\newblock Comments on ``{Investigating} therapies of potentially great benefit: {ECMO}'' by {Ware}.
+\newblock {\em Statistical Science}, 4(4):310--317.
+
+\bibitem[Kingma and Dhariwal, 2018]{kingma2018}
+Kingma, D.~P. and Dhariwal, P. (2018).
+\newblock {Glow}: Generative flow with invertible $1{\times}1$ convolutions.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~31.
+
+\bibitem[Knight, 1921]{knight1921}
+Knight, F.~H. (1921).
+\newblock {\em Risk, Uncertainty and Profit}.
+\newblock Houghton Mifflin, Boston, MA.
+
+\bibitem[Knoblauch et~al., 2019]{knoblauch2019}
+Knoblauch, J., Jewson, J., and Damoulas, T. (2019).
+\newblock Doubly robust {Bayesian} inference for non-stationary streaming data with $\beta$-divergences.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~32.
+
+\bibitem[Knoblauch et~al., 2022]{knoblauch2022}
+Knoblauch, J., Jewson, J., and Damoulas, T. (2022).
+\newblock An optimization-centric view on {Bayes}' rule: Reviewing and generalizing variational inference.
+\newblock {\em Journal of Machine Learning Research}, 23(132):1--109.
+
+\bibitem[Lipman et~al., 2023]{lipman2022}
+Lipman, Y., Chen, R. T.~Q., Ben-Hamu, H., Nickel, M., and Le, M. (2023).
+\newblock Flow matching for generative modeling.
+\newblock In {\em International Conference on Learning Representations}.
+\newblock arXiv:2210.02747 (2022).
+
+\bibitem[Liu et~al., 2023]{liu2022}
+Liu, X., Gong, C., and Liu, Q. (2023).
+\newblock Flow straight and fast: Learning to generate and transfer data with rectified flow.
+\newblock arXiv:2209.03003 (2022).
+
+\bibitem[MacKay, 1992]{mackay1992}
+MacKay, D. J.~C. (1992).
+\newblock A practical {Bayesian} framework for backpropagation networks.
+\newblock {\em Neural Computation}, 4(3):448--472.
+
+\bibitem[Minka, 2001]{minka2001}
+Minka, T.~P. (2001).
+\newblock Expectation propagation for approximate {Bayesian} inference.
+\newblock In {\em Uncertainty in Artificial Intelligence}, pages 362--369.
+
+\bibitem[Neal, 2011]{neal2011}
+Neal, R.~M. (2011).
+\newblock {MCMC} using {Hamiltonian} dynamics.
+\newblock In Brooks, S., Gelman, A., Jones, G.~L., and Meng, X.-L., editors, {\em Handbook of {Markov} Chain {Monte Carlo}}, pages 113--162. CRC Press, Boca Raton, FL.
+
+\bibitem[Opper and Saad, 2001]{opper2001}
+Opper, M. and Saad, D. (2001).
+\newblock {\em Advanced Mean Field Methods: Theory and Practice}.
+\newblock MIT Press, Cambridge, MA.
+
+\bibitem[Papamakarios et~al., 2021]{papamakarios2021}
+Papamakarios, G., Nalisnick, E., Rezende, D.~J., Mohamed, S., and Lakshminarayanan, B. (2021).
+\newblock Normalizing flows for probabilistic modeling and inference.
+\newblock {\em Journal of Machine Learning Research}, 22(57):1--64.
+
+\bibitem[Perez et~al., 2018]{perez2018}
+Perez, E., Strub, F., de~Vries, H., Dumoulin, V., and Courville, A. (2018).
+\newblock {FiLM}: Visual reasoning with a general conditioning layer.
+\newblock In {\em AAAI Conference on Artificial Intelligence}, volume~32.
+
+\bibitem[Rezende and Mohamed, 2015]{rezende2015}
+Rezende, D.~J. and Mohamed, S. (2015).
+\newblock Variational inference with normalizing flows.
+\newblock In {\em International Conference on Machine Learning}, pages 1530--1538.
+
+\bibitem[Rue et~al., 2009]{rue2009}
+Rue, H., Martino, S., and Chopin, N. (2009).
+\newblock Approximate {Bayesian} inference for latent {Gaussian} models by using integrated nested {Laplace} approximations.
+\newblock {\em Journal of the Royal Statistical Society: Series B}, 71(2):319--392.
+
+\bibitem[Saul and Jordan, 1996]{saul1996}
+Saul, L.~K. and Jordan, M.~I. (1996).
+\newblock Exploiting tractable substructures in intractable networks.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~8.
+
+\bibitem[Sisson et~al., 2018]{sisson2018}
+Sisson, S.~A., Fan, Y., and Beaumont, M.~A. (2018).
+\newblock {\em Handbook of Approximate {Bayesian} Computation}.
+\newblock CRC Press, Boca Raton, FL.
+
+\bibitem[Turner and Sahani, 2011]{turner2011}
+Turner, R.~E. and Sahani, M. (2011).
+\newblock Two problems with variational expectation maximisation for time-series models.
+\newblock In Barber, D., Cemgil, A.~T., and Chiappa, S., editors, {\em Bayesian Time Series Models}, pages 109--130. Cambridge University Press.
+
+\bibitem[Vaswani et~al., 2017]{vaswani2017}
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.~N., Kaiser, {\L}., and Polosukhin, I. (2017).
+\newblock Attention is all you need.
+\newblock In {\em Advances in Neural Information Processing Systems}, volume~30.
+
+\bibitem[Wainwright and Jordan, 2008]{wainwright2008}
+Wainwright, M.~J. and Jordan, M.~I. (2008).
+\newblock {\em Graphical Models, Exponential Families, and Variational Inference}.
+\newblock Now Publishers, Hanover, MA.
+
+\bibitem[Walley, 1991]{walley1991}
+Walley, P. (1991).
+\newblock {\em Statistical Reasoning with Imprecise Probabilities}.
+\newblock Chapman and Hall, London.
+
+\bibitem[Wenzel et~al., 2020]{wenzel2020}
+Wenzel, F., Roth, K., Veeling, B.~S., \'{S}wi\k{a}tkowski, J., Tran, L., Mandt, S., Snoek, J., Salimans, T., Jenatton, R., and Nowozin, S. (2020).
+\newblock How good is your {Bayes} approximation? {Understanding} and improving deep learning for uncertainty.
+\newblock arXiv:2002.02405.
+
+\bibitem[Wheeler, 2023]{wheeler2022}
+Wheeler, G. (2023).
+\newblock Imprecise probabilities.
+\newblock In Zalta, E.~N., editor, {\em The {Stanford} Encyclopedia of Philosophy}. Metaphysics Research Lab, Stanford University.
+\newblock (cited as Wheeler, 2022 in text).
+
+\bibitem[Yao et~al., 2018]{yao2018}
+Yao, Y., Vehtari, A., Simpson, D., and Gelman, A. (2018).
+\newblock Using stacking to average {Bayesian} predictive distributions.
+\newblock {\em Bayesian Analysis}, 13(3):917--1007.
+
+\end{thebibliography}
